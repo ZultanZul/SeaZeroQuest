@@ -3,8 +3,8 @@
 var Colors = {
 	white:0xd8d0d1,
 	grey:0xcccccc,
-	green: 0x5bd46d,
-	yellow: 0xd7de41,
+	lightGreen: 0x8eafa6,
+	yellow: 0xffd342,
 	brown: 0x715337,
 	red: 0xdf3636,
 };
@@ -41,7 +41,7 @@ function createScene() {
 		farPlane
 		);
 
-	camera.position.set(0,150,400);
+	camera.position.set(0,50,100);
 	camera.lookAt(scene.position);
 
 	renderer = new THREE.WebGLRenderer({ 
@@ -49,7 +49,7 @@ function createScene() {
 		antialias: true 
 	});
 
-	//controls = new THREE.OrbitControls(camera, renderer.domElement);
+	controls = new THREE.OrbitControls(camera, renderer.domElement);
 
 	renderer.setSize(WIDTH, HEIGHT);
 	renderer.shadowMap.enabled = true;
@@ -83,7 +83,7 @@ function createLights() {
 	shadowLight.shadow.camera.top = 500;
 	shadowLight.shadow.camera.bottom = -500;
 	shadowLight.shadow.camera.near = 1;
-	shadowLight.shadow.camera.far = 800;
+	shadowLight.shadow.camera.far = 1000;
 	shadowLight.shadow.mapSize.width = 2056;
 	shadowLight.shadow.mapSize.height = 2056;
 
@@ -115,7 +115,7 @@ var Sea = function(ampValue, vertX, vertY, waveOpacity,textOffsetX, textOffsetY)
 	textWaves.wrapS = THREE.RepeatWrapping;
 	textWaves.wrapT = THREE.RepeatWrapping;
 	textWaves.offset = new THREE.Vector2(textOffsetX, textOffsetY);
-	textWaves.repeat.set( 110, 110 );
+	textWaves.repeat.set( 90, 90 );
 
 	var matWaves = new THREE.MeshPhongMaterial( {
 		//color:0x307ddd,
@@ -155,6 +155,8 @@ var Boat = function() {
 	var matWhite = new THREE.MeshPhongMaterial({color:Colors.white, shading:THREE.SmoothShading, wireframe:false});
 	var matRed = new THREE.MeshPhongMaterial({color:Colors.red, shading:THREE.SmoothShading, wireframe:false});
 	var matBrown = new THREE.MeshPhongMaterial({color:Colors.brown, shading:THREE.SmoothShading, wireframe:false});
+	var matLightGreen = new THREE.MeshPhongMaterial({color:Colors.lightGreen, shading:THREE.SmoothShading, wireframe:false});
+	var matYellow = new THREE.MeshPhongMaterial({color:Colors.yellow, shading:THREE.SmoothShading, wireframe:false});
 
 	var geomHull = new THREE.BoxGeometry(25,5,50,1,1,2);
 	//bow vertices
@@ -265,18 +267,8 @@ var Boat = function() {
 	lowerRail.receiveShadow = true;	
 	hull.add(upperRail);
 
-
-	//Cabin
-
-	var geomCabin = new THREE.BoxGeometry(15,5,10,1,1,1);
-	var cabin = new THREE.Mesh(geomCabin, matBrown);
-	cabin.castShadow = true;
-	cabin.receiveShadow = true;	
-	cabin.position.set(0,5,0);
-	//hull.add(cabin);
-
 	// Railing
-	var geomRail = new THREE.BoxGeometry(1.5,3,1.5,);
+	var geomRail = new THREE.BoxBufferGeometry(1.5,3,1.5,);
 	var rail1 = new THREE.Mesh(geomRail, matBrown);
 	rail1.castShadow = true;
 	rail1.receiveShadow = true;	
@@ -339,6 +331,73 @@ var Boat = function() {
 	rail7.rotation.y = Math.PI/3.5;
 	hull.add(rail7);
 
+
+	//Cabin
+
+	var cabin = new THREE.Group();	
+	cabin.position.set(0,13,10);
+
+	var geomCabinCorner = new THREE.BoxBufferGeometry(2,24,2);
+	var cabinCorner1 = new THREE.Mesh(geomCabinCorner, matBrown);
+	cabinCorner1.castShadow = true;
+	cabinCorner1.receiveShadow = true;	
+	cabinCorner1.position.set(7,1,-7);
+	cabin.add(cabinCorner1);
+
+	var cabinCorner2 = cabinCorner1.clone();
+	cabinCorner2.castShadow = true;
+	cabinCorner2.receiveShadow = true;	
+	cabinCorner2.position.set(-7,1,-7);
+	cabin.add(cabinCorner2);
+
+	var geomCabinCornerShort = new THREE.BoxBufferGeometry(2,22,2);
+	var cabinCorner3 = new THREE.Mesh(geomCabinCornerShort, matBrown);
+	cabinCorner3.castShadow = true;
+	cabinCorner3.receiveShadow = true;	
+	cabinCorner3.position.set(-7,0,7);
+	cabin.add(cabinCorner3);
+
+	var cabinCorner4 = cabinCorner3.clone();
+	cabinCorner4.castShadow = true;
+	cabinCorner4.receiveShadow = true;	
+	cabinCorner4.position.set(7,0,7);
+	cabin.add(cabinCorner4);
+
+	var geomCabinRoof = new THREE.BoxGeometry(20,1,20, 2,1,1);
+	geomCabinRoof.vertices[8].y+=.5;
+	geomCabinRoof.vertices[9].y+=.5;
+	geomCabinRoof.vertices[10].y+=.5;
+	geomCabinRoof.vertices[11].y+=.5;
+	var cabinRoof = new THREE.Mesh(geomCabinRoof, matWhite);
+	cabinRoof.castShadow = true;
+	cabinRoof.receiveShadow = false;	
+	cabinRoof.position.set(0,12,0);
+	cabinRoof.rotation.x = Math.PI/20;
+	cabin.add(cabinRoof);
+
+	var geomRoofCrest = new THREE.BoxGeometry(5,0.5,20, 2,1,1);
+	geomRoofCrest.vertices[8].y+=.5;
+	geomRoofCrest.vertices[9].y+=.5;
+	var roofCrest = new THREE.Mesh(geomRoofCrest, matGrey);
+	roofCrest.castShadow = false;
+	roofCrest.receiveShadow = true;	
+	roofCrest.position.set(0,1,0);
+	cabinRoof.add(roofCrest);
+
+	var geomCabinSideWall = new THREE.BoxGeometry(1,22,12);
+	geomCabinSideWall.vertices[1].y+=2.5;
+	geomCabinSideWall.vertices[4].y+=2.5;
+	var cabinSideWall = new THREE.Mesh(geomCabinSideWall, matWhite);
+	cabinSideWall.castShadow = true;
+	cabinSideWall.receiveShadow = true;	
+	cabinSideWall.position.set(6.5,0,0);
+	cabin.add(cabinSideWall);
+
+
+
+	hull.add(cabin);
+
+
 	//Engine Block
 
 	this.engineBlock = new THREE.Group();
@@ -347,13 +406,10 @@ var Boat = function() {
 	var engineMain = new THREE.Mesh(geomEngineMain, matGrey);
 	engineMain.castShadow = true;
 	engineMain.receiveShadow = true;	
-	//engineMain.position.set(0,2,27);
 	this.engineBlock.add(engineMain);
 
 	var geomEngineUpper = new THREE.BoxBufferGeometry(5,3,6);
 	var engineUpper = new THREE.Mesh(geomEngineUpper, matGrey);
-	// engineUpper.castShadow = true;
-	// engineUpper.receiveShadow = true;	
 	engineUpper.position.set(0,5.5,-1.5);
 	engineMain.add(engineUpper);
 
@@ -364,8 +420,6 @@ var Boat = function() {
 	geomEngineTop.vertices[0].x-=1;	
 
 	var engineTop = new THREE.Mesh(geomEngineTop, matRed);
-	// engineTop.castShadow = true;
-	// engineTop.receiveShadow = true;	
 	engineTop.position.set(0,2.5,0);
 	engineUpper.add(engineTop);
 
@@ -424,12 +478,12 @@ Boat.prototype.swayBoat = function (){
 }
 
 
-var Beacon = function(color) {
+var Beacon = function(color1, color2) {
 
 	this.mesh = new THREE.Object3D();
 
-	var matRed = new THREE.MeshPhongMaterial({color:color, shading:THREE.FlatShading, wireframe:false});
-	var matWhite = new THREE.MeshPhongMaterial({color:Colors.white, shading:THREE.FlatShading, wireframe:false});
+	var matRed = new THREE.MeshPhongMaterial({color:color1, shading:THREE.FlatShading, wireframe:false});
+	var matWhite = new THREE.MeshPhongMaterial({color:color2, shading:THREE.FlatShading, wireframe:false});
 
 	var geomBeaconBase = new THREE.CylinderBufferGeometry( 10, 10, 6, 10, 1);
 	var beaconBase = new THREE.Mesh(geomBeaconBase, matRed);
@@ -484,7 +538,7 @@ var ScatterBeacons = function(){
 
 	for(var i=0; i<nBeacons; i++){
 	
-		var b = new Beacon(Colors.red);
+		var b = new Beacon(Colors.red,Colors.white);
 		var min = -700;
 		var max = 700;
 		b.mesh.position.z = Math.random() * (max - min) + min;
@@ -536,8 +590,6 @@ function initSkybox(){
 	
 	skyBox.position.set(0,0,0);
 	scene.add( skyBox );
-
-
 }
 
 
@@ -548,7 +600,7 @@ var beacon;
 var scatteredBeacons;
 
 function createSea(){ 
-	sea = new Sea(1.7, 100, 100, 0.85, 0, 0);
+	sea = new Sea(1.7, 100, 100, 0.8, 0, 0);
 	scene.add(sea.mesh);
 	sea.mesh.castShadow = false;
 	sea.mesh.receiveShadow = true;
@@ -569,7 +621,7 @@ function createBoat(){
 	scene.add(boat.mesh);
 }
 function createBeacon(){ 
-	beacon = new Beacon(Colors.yellow);
+	beacon = new Beacon(Colors.white,Colors.red);
 	beacon.mesh.position.set(40, 0, -75);
 	scene.add(beacon.mesh);
 }
@@ -612,7 +664,7 @@ function update (){
 	var moveDistance = 100 * delta; // 100 pixels per second
 	var rotateAngle = Math.PI / 4 * delta;   // pi/2 radians (90 degrees) per second	
 	var propellorAngle = Math.PI * 4 * delta;   // 360 degrees per second
-	var engineAngle = Math.PI * 4;
+	var engineAngle = Math.PI  / 6 * delta;
 
 	var speed;
 	
@@ -630,22 +682,26 @@ function update (){
 	var rotation_matrix = new THREE.Matrix4().identity();
 	if ( keyboard.pressed("A") )
 		boat.mesh.rotateOnAxis( new THREE.Vector3(0,1,0), rotateAngle);
-	if ( keyboard.pressed("A") )
-		boat.engineBlock.rotateOnAxis( new THREE.Vector3(0,1,0), -engineAngle);
+	// if ( keyboard.pressed("A") )
+	// 	boat.engineBlock.rotateOnAxis( new THREE.Vector3(0,1,0), -engineAngle);
 
 	if ( keyboard.pressed("D") )
 		boat.mesh.rotateOnAxis( new THREE.Vector3(0,1,0), -rotateAngle);
-	if ( keyboard.pressed("D") )
-		boat.engineBlock.rotateOnAxis( new THREE.Vector3(0,1,0), engineAngle);
+	// if ( keyboard.pressed("D") )
+	// 	boat.engineBlock.rotateOnAxis( new THREE.Vector3(0,1,0), engineAngle);
 
-	var relativeCameraOffset = new THREE.Vector3(0,60,150);
 
-	var cameraOffset = relativeCameraOffset.applyMatrix4( boat.mesh.matrixWorld );
+	// CHASE CAMERA Controls
+	//---------------------------
 
-	camera.position.x = cameraOffset.x;
-	camera.position.y = cameraOffset.y;
-	camera.position.z = cameraOffset.z;
-	camera.lookAt( boat.mesh.position );
+	// var relativeCameraOffset = new THREE.Vector3(0,60,150);
 
-	//controls.update();	
+	// var cameraOffset = relativeCameraOffset.applyMatrix4( boat.mesh.matrixWorld );
+
+	// camera.position.x = cameraOffset.x;
+	// camera.position.y = cameraOffset.y;
+	// camera.position.z = cameraOffset.z;
+	// camera.lookAt( boat.mesh.position );
+
+	controls.update();	
 }
