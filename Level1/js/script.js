@@ -7,6 +7,7 @@ var Colors = {
 	yellow: 0xffd342,
 	brown: 0x715337,
 	red: 0xdf3636,
+	blue: 0x307ddd,
 };
 
 window.addEventListener('load', init, false);
@@ -84,8 +85,8 @@ function createLights() {
 	shadowLight.shadow.camera.bottom = -500;
 	shadowLight.shadow.camera.near = 1;
 	shadowLight.shadow.camera.far = 1000;
-	shadowLight.shadow.mapSize.width = 2056;
-	shadowLight.shadow.mapSize.height = 2056;
+	shadowLight.shadow.mapSize.width = 1024;
+	shadowLight.shadow.mapSize.height = 1024;
 
 	scene.add(shadowLight);
 }
@@ -157,6 +158,7 @@ var Boat = function() {
 	var matBrown = new THREE.MeshPhongMaterial({color:Colors.brown, shading:THREE.SmoothShading, wireframe:false});
 	var matLightGreen = new THREE.MeshPhongMaterial({color:Colors.lightGreen, shading:THREE.SmoothShading, wireframe:false});
 	var matYellow = new THREE.MeshPhongMaterial({color:Colors.yellow, shading:THREE.SmoothShading, wireframe:false});
+	var matBlueGlass = new THREE.MeshPhongMaterial({color:Colors.blue, shading:THREE.SmoothShading,	transparent: true, opacity: .6, wireframe:false});
 
 	var geomHull = new THREE.BoxGeometry(25,5,50,1,1,2);
 	//bow vertices
@@ -299,11 +301,11 @@ var Boat = function() {
 	railRep.position.set(-11,7,14);
 	hull.add(railRep);
 
-		var rail5 = rail1.clone();
-		rail5.castShadow = true;
-		rail5.receiveShadow = true;	
-		rail5.position.set(22,0,0);
-		railRep.add(rail5);
+	var rail5 = rail1.clone();
+	rail5.castShadow = true;
+	rail5.receiveShadow = true;	
+	rail5.position.set(22,0,0);
+	railRep.add(rail5);
 
 	var railRep2 = railRep.clone();
 	railRep2.castShadow = true;
@@ -333,7 +335,6 @@ var Boat = function() {
 
 
 	//Cabin
-
 	var cabin = new THREE.Group();	
 	cabin.position.set(0,13,10);
 
@@ -363,6 +364,7 @@ var Boat = function() {
 	cabinCorner4.position.set(7,0,7);
 	cabin.add(cabinCorner4);
 
+	//Cabin Roof
 	var geomCabinRoof = new THREE.BoxGeometry(20,1,20, 2,1,1);
 	geomCabinRoof.vertices[8].y+=.5;
 	geomCabinRoof.vertices[9].y+=.5;
@@ -384,14 +386,92 @@ var Boat = function() {
 	roofCrest.position.set(0,1,0);
 	cabinRoof.add(roofCrest);
 
+	//Cabin Walls
+
 	var geomCabinSideWall = new THREE.BoxGeometry(1,22,12);
 	geomCabinSideWall.vertices[1].y+=2.5;
 	geomCabinSideWall.vertices[4].y+=2.5;
-	var cabinSideWall = new THREE.Mesh(geomCabinSideWall, matWhite);
-	cabinSideWall.castShadow = true;
-	cabinSideWall.receiveShadow = true;	
-	cabinSideWall.position.set(6.5,0,0);
-	cabin.add(cabinSideWall);
+	var geomCabinSideWallCut = new THREE.CylinderGeometry(4,4,1,20);
+	geomCabinSideWallCut.applyMatrix(new THREE.Matrix4().makeRotationZ(-Math.PI/2));
+	geomCabinSideWallCut.applyMatrix(new THREE.Matrix4().makeTranslation(0, 4, 0));	
+	var CabinSideWallBSP = new ThreeBSP(geomCabinSideWall);
+	var CabinSideWallCutBSP = new ThreeBSP(geomCabinSideWallCut);
+	var CabinSideWallIntersectionBSP = CabinSideWallBSP.subtract(CabinSideWallCutBSP);  
+	var cabinSideWallR = CabinSideWallIntersectionBSP.toMesh(matGrey);
+	cabinSideWallR.castShadow = true;
+	cabinSideWallR.receiveShadow = true;	
+	cabinSideWallR.position.set(6.5,0,0);
+	cabin.add(cabinSideWallR);
+
+
+		//Cabin SideWindows	
+		var geomCabinSideWindowFrame = new THREE.CylinderGeometry(4,4,1.5,20);
+		var geomCabinSideWindowFrameCut = new THREE.CylinderGeometry(3.5,3.5,1.5,20);
+		var geomCabinSideWindowFrameBSP = new ThreeBSP(geomCabinSideWindowFrame);
+		var geomCabinSideWindowFrameCutBSP = new ThreeBSP(geomCabinSideWindowFrameCut);
+		var CabinSideWindowFrameIntersectionBSP = geomCabinSideWindowFrameBSP.subtract(geomCabinSideWindowFrameCutBSP);  	
+		var cabinSideWindowFrame = CabinSideWindowFrameIntersectionBSP.toMesh(matGrey);
+		cabinSideWindowFrame.castShadow = true;
+		cabinSideWindowFrame.receiveShadow = true;	
+		cabinSideWindowFrame.applyMatrix(new THREE.Matrix4().makeRotationZ(-Math.PI/2));
+		cabinSideWindowFrame.position.set(0,4,0);
+		cabinSideWallR.add(cabinSideWindowFrame);
+
+
+		var geomCabinSideWindow = new THREE.CylinderBufferGeometry(3.5,3.5,1,20);
+		var cabinSideWindow = new THREE.Mesh(geomCabinSideWindow, matBlueGlass);
+		cabinSideWindow.castShadow = false;
+		cabinSideWindow.receiveShadow = true;	
+		cabinSideWindow.position.set(0,0,0);
+		cabinSideWindowFrame.add(cabinSideWindow);
+
+		var cabinSideWallL = cabinSideWallR.clone();
+		cabinSideWallL.castShadow = true;
+		cabinSideWallL.receiveShadow = true;	
+		cabinSideWallL.position.set(-6.5,0,0);
+		cabin.add(cabinSideWallL);
+
+
+	var geomCabinFrontWall = new THREE.BoxGeometry(12,24,1);
+	var geomCabinFrontWallCut = new THREE.BoxGeometry(9,12,1,);
+	geomCabinFrontWallCut.applyMatrix( new THREE.Matrix4().makeTranslation(0, 3, 0));
+	var CabinFrontWallBSP = new ThreeBSP(geomCabinFrontWall);
+	var CabinFrontWallCutBSP = new ThreeBSP(geomCabinFrontWallCut);
+	var CabinFrontWallIntersectionBSP = CabinFrontWallBSP.subtract(CabinFrontWallCutBSP);  	
+	var cabinFrontWall = CabinFrontWallIntersectionBSP.toMesh(matWhite);
+
+	cabinFrontWall.castShadow = true;
+	cabinFrontWall.receiveShadow = true;	
+	cabinFrontWall.position.set(0,1.5,-6.5);
+
+	cabin.add(cabinFrontWall);
+
+	var geomCabinBackWall = new THREE.BoxBufferGeometry(12,22,1);
+	var cabinBackWall = new THREE.Mesh(geomCabinBackWall, matWhite);
+	cabinBackWall.castShadow = true;
+	cabinBackWall.receiveShadow = true;	
+	cabinBackWall.position.set(0,0,6.5);
+	cabin.add(cabinBackWall);
+
+
+	//Cabin Windows
+	var geomCabinFrontWindowFrame = new THREE.BoxGeometry(9,12,1.5);
+	var geomCabinFrontWindowFrameCut = new THREE.BoxGeometry(8,11,1.5);
+	var geomCabinFrontWindowFrameBSP = new ThreeBSP(geomCabinFrontWindowFrame);
+	var geomCabinFrontWindowFrameCutBSP = new ThreeBSP(geomCabinFrontWindowFrameCut);
+	var CabinFrontWindowFrameIntersectionBSP = geomCabinFrontWindowFrameBSP.subtract(geomCabinFrontWindowFrameCutBSP);  	
+	var cabinFrontWindowFrame = CabinFrontWindowFrameIntersectionBSP.toMesh(matGrey);
+	cabinFrontWindowFrame.castShadow = true;
+	cabinFrontWindowFrame.receiveShadow = true;	
+	cabinFrontWindowFrame.position.set(0,3,0);
+	cabinFrontWall.add(cabinFrontWindowFrame);
+
+	var geomCabinFrontWindow = new THREE.BoxBufferGeometry(8,11,1);
+	var cabinFrontWindow = new THREE.Mesh(geomCabinFrontWindow, matBlueGlass);
+	cabinFrontWindow.castShadow = false;
+	cabinFrontWindow.receiveShadow = true;	
+	cabinFrontWindow.position.set(0,0,0);
+	cabinFrontWindowFrame.add(cabinFrontWindow);
 
 
 
@@ -399,7 +479,6 @@ var Boat = function() {
 
 
 	//Engine Block
-
 	this.engineBlock = new THREE.Group();
 	this.engineBlock.position.set(0,2,27);	
 	var geomEngineMain = new THREE.BoxBufferGeometry(5,8.5,3);
