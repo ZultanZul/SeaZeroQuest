@@ -6,8 +6,10 @@ var Colors = {
 	lightGreen: 0x8eafa6,
 	yellow: 0xffd342,
 	brown: 0x715337,
+	lightBrown: 0x725f4c,
 	red: 0xdf3636,
 	blue: 0x307ddd,
+	orange: 0xDB7525,
 };
 
 window.addEventListener('load', init, false);
@@ -77,7 +79,7 @@ function createLights() {
 
 	shadowLight = new THREE.DirectionalLight(0xbfe0f8, .8);
 
-	shadowLight.position.set(-100,350,-350);
+	shadowLight.position.set(-100,500,-350);
 	shadowLight.castShadow = true;
 	shadowLight.shadow.camera.left = -500;
 	shadowLight.shadow.camera.right = 500;
@@ -85,8 +87,8 @@ function createLights() {
 	shadowLight.shadow.camera.bottom = -500;
 	shadowLight.shadow.camera.near = 1;
 	shadowLight.shadow.camera.far = 1000;
-	shadowLight.shadow.mapSize.width = 1024;
-	shadowLight.shadow.mapSize.height = 1024;
+	shadowLight.shadow.mapSize.width = 2056;
+	shadowLight.shadow.mapSize.height = 2056;
 
 	scene.add(shadowLight);
 }
@@ -156,9 +158,12 @@ var Boat = function() {
 	var matWhite = new THREE.MeshPhongMaterial({color:Colors.white, shading:THREE.SmoothShading, wireframe:false});
 	var matRed = new THREE.MeshPhongMaterial({color:Colors.red, shading:THREE.SmoothShading, wireframe:false});
 	var matBrown = new THREE.MeshPhongMaterial({color:Colors.brown, shading:THREE.SmoothShading, wireframe:false});
+	var matLightBrown = new THREE.MeshPhongMaterial({color:Colors.lightBrown, shading:THREE.SmoothShading, wireframe:false});
 	var matLightGreen = new THREE.MeshPhongMaterial({color:Colors.lightGreen, shading:THREE.SmoothShading, wireframe:false});
 	var matYellow = new THREE.MeshPhongMaterial({color:Colors.yellow, shading:THREE.SmoothShading, wireframe:false});
 	var matBlueGlass = new THREE.MeshPhongMaterial({color:Colors.blue, shading:THREE.SmoothShading,	transparent: true, opacity: .6, wireframe:false});
+	var matOrange = new THREE.MeshPhongMaterial({color:Colors.orange, shading:THREE.SmoothShading, wireframe:false});
+
 
 	var geomHull = new THREE.BoxGeometry(25,5,50,1,1,2);
 	//bow vertices
@@ -433,7 +438,7 @@ var Boat = function() {
 
 
 	var geomCabinFrontWall = new THREE.BoxGeometry(12,24,1);
-	var geomCabinFrontWallCut = new THREE.BoxGeometry(9,12,1,);
+	var geomCabinFrontWallCut = new THREE.BoxGeometry(9,12,1);
 	geomCabinFrontWallCut.applyMatrix( new THREE.Matrix4().makeTranslation(0, 3, 0));
 	var CabinFrontWallBSP = new ThreeBSP(geomCabinFrontWall);
 	var CabinFrontWallCutBSP = new ThreeBSP(geomCabinFrontWallCut);
@@ -446,13 +451,40 @@ var Boat = function() {
 
 	cabin.add(cabinFrontWall);
 
-	var geomCabinBackWall = new THREE.BoxBufferGeometry(12,22,1);
-	var cabinBackWall = new THREE.Mesh(geomCabinBackWall, matWhite);
+	var geomCabinBackWall = new THREE.BoxGeometry(12,22,1);
+	var geomCabinBackWallCut = new THREE.BoxGeometry(8,16,1);
+	//geomCabinBackWallCut.applyMatrix( new THREE.Matrix4().makeTranslation(0, 0, 0));
+	var CabinBackWallBSP = new ThreeBSP(geomCabinBackWall);
+	var CabinBackWallCutBSP = new ThreeBSP(geomCabinBackWallCut);
+	var CabinBackWallIntersectionBSP = CabinBackWallBSP.subtract(CabinBackWallCutBSP);  	
+	var cabinBackWall = CabinBackWallIntersectionBSP.toMesh(matWhite);
 	cabinBackWall.castShadow = true;
 	cabinBackWall.receiveShadow = true;	
 	cabinBackWall.position.set(0,0,6.5);
 	cabin.add(cabinBackWall);
 
+	var geomCabinDoor = new THREE.BoxGeometry(8,16,1);
+	var geomCabinDoorCut = new THREE.CylinderGeometry(2,2,1,20);
+	geomCabinDoorCut.applyMatrix(new THREE.Matrix4().makeRotationX(-Math.PI/2));
+	geomCabinDoorCut.applyMatrix(new THREE.Matrix4().makeTranslation(0, 2, 0));	
+	var CabinDoorBSP = new ThreeBSP(geomCabinDoor);
+	var CabinDoorCutBSP = new ThreeBSP(geomCabinDoorCut);
+	var CabinDoorlIntersectionBSP = CabinDoorBSP.subtract(CabinDoorCutBSP);  
+	var cabinDoor = CabinDoorlIntersectionBSP.toMesh(matGrey);
+
+	var geomCabinDoorWindow = new THREE.CylinderBufferGeometry(2,2,1,20);
+	geomCabinDoorWindow.applyMatrix(new THREE.Matrix4().makeRotationX(-Math.PI/2));
+	geomCabinDoorWindow.applyMatrix(new THREE.Matrix4().makeTranslation(0, 2, 0));	
+	var cabinDoorWindow = new THREE.Mesh(geomCabinDoorWindow, matBlueGlass);
+	cabinDoorWindow.castShadow = false;
+	cabinDoorWindow.receiveShadow = true;	
+	cabinDoorWindow.position.set(0,0,0);
+	cabinDoor.add(cabinDoorWindow);
+
+	cabinDoor.castShadow = true;
+	cabinDoor.receiveShadow = true;	
+	cabinDoor.position.set(0,0,1);
+	cabinBackWall.add(cabinDoor);
 
 	//Cabin Windows
 	var geomCabinFrontWindowFrame = new THREE.BoxGeometry(9,12,1.5);
@@ -473,7 +505,36 @@ var Boat = function() {
 	cabinFrontWindow.position.set(0,0,0);
 	cabinFrontWindowFrame.add(cabinFrontWindow);
 
+	//LifeSaver
+	var geomLifeSaver = new THREE.TorusBufferGeometry( 3, 1, 10, 16 );
+	var lifeSaver = new THREE.Mesh(geomLifeSaver, matOrange);
+	lifeSaver.castShadow = true;
+	lifeSaver.receiveShadow = true;	
+	lifeSaver.position.set(0,2,8);
+	lifeSaver.rotation.z = Math.PI/4;
+	lifeSaver.scale.set(1,1,0.5);
 
+	var geomLifeSaverBands = new THREE.BoxBufferGeometry(1.5,2.5,2.5);
+	var lifeSaverBand1 = new THREE.Mesh(geomLifeSaverBands, matWhite);
+	lifeSaverBand1.castShadow = true;
+	lifeSaverBand1.receiveShadow = true;	
+	lifeSaverBand1.position.set(0,2.85,0);
+	lifeSaver.add(lifeSaverBand1);
+
+	var lifeSaverBand2 = lifeSaverBand1.clone();
+	lifeSaverBand2.castShadow = true;
+	lifeSaverBand2.receiveShadow = true;
+	lifeSaverBand2.rotation.z = Math.PI/2;
+	lifeSaverBand2.position.set(2.85,-2.85,0);
+	lifeSaverBand1.add(lifeSaverBand2);
+
+	var lifeSaverBand3 = lifeSaverBand1.clone();
+	lifeSaverBand3.castShadow = true;
+	lifeSaverBand3.receiveShadow = true;
+	lifeSaverBand3.rotation.z =Math.PI;
+	lifeSaverBand3.position.set(0,-5.75,0);
+	lifeSaverBand1.add(lifeSaverBand3);
+	cabin.add(lifeSaver);
 
 	hull.add(cabin);
 
@@ -499,6 +560,8 @@ var Boat = function() {
 	geomEngineTop.vertices[0].x-=1;	
 
 	var engineTop = new THREE.Mesh(geomEngineTop, matRed);
+	engineTop.castShadow = true;
+	engineTop.receiveShadow = true;	
 	engineTop.position.set(0,2.5,0);
 	engineUpper.add(engineTop);
 
@@ -743,7 +806,7 @@ function update (){
 	var moveDistance = 100 * delta; // 100 pixels per second
 	var rotateAngle = Math.PI / 4 * delta;   // pi/2 radians (90 degrees) per second	
 	var propellorAngle = Math.PI * 4 * delta;   // 360 degrees per second
-	var engineAngle = Math.PI  / 6 * delta;
+	var engineAngle = Math.PI  / 5 * delta;
 
 	var speed;
 	
