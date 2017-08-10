@@ -3,6 +3,7 @@
 var Colors = {
 	white:0xd8d0d1,
 	grey:0xcccccc,
+	darkGrey: 0x7c7c7c,
 	lightGreen: 0x8eafa6,
 	yellow: 0xffd342,
 	brown: 0x715337,
@@ -10,6 +11,7 @@ var Colors = {
 	red: 0xdf3636,
 	blue: 0x307ddd,
 	orange: 0xDB7525,
+	green: 0x28b736,
 };
 
 window.addEventListener('load', init, false);
@@ -37,21 +39,11 @@ function createScene() {
 	fieldOfView = 60;
 	nearPlane = 1;
 	farPlane = 10000;
-	camera = new THREE.PerspectiveCamera(
-		fieldOfView,
-		aspectRatio,
-		nearPlane,
-		farPlane
-		);
-
-	camera.position.set(0,50,100);
 
 	renderer = new THREE.WebGLRenderer({ 
 		alpha: true, 
 		antialias: true 
 	});
-
-	controls = new THREE.OrbitControls(camera, renderer.domElement);
 
 	renderer.setSize(WIDTH, HEIGHT);
 	renderer.shadowMap.enabled = true;
@@ -619,8 +611,20 @@ var Boat = function() {
 
 
 	this.group.add(hull);
+	camera = new THREE.PerspectiveCamera(
+		fieldOfView,
+		aspectRatio,
+		nearPlane,
+		farPlane
+		);
+
+	controls = new THREE.OrbitControls(camera, renderer.domElement);
+	camera.position.set(0,30,100);
+
+	this.group.add(camera);
 	this.group.applyMatrix( new THREE.Matrix4().makeTranslation(0, 0, -24) );
 	this.mesh.add(this.group);
+
 }
 
 
@@ -683,7 +687,7 @@ Beacon.prototype.swayBeacon = function (){
 }
 
 var beaconArray = [];
-var nBeacons = 25;
+var nBeacons = 15;
 	
 // Randomly Scatter Beacons through the Scene on a 1400x1400 Grid
 
@@ -720,15 +724,191 @@ var swayBeacon = function (){
 function DesertIsland(){
 	this.mesh = new THREE.Object3D();
 	var island = new THREE.Group();
-
-	island.position.set(0, -30, 0);
+	island.position.set(0, 0, 0);
 
 	var matYellow = new THREE.MeshPhongMaterial({color:Colors.yellow, shading:THREE.FlatShading, wireframe:false});
+	var matGrey = new THREE.MeshPhongMaterial({color:Colors.darkGrey, shading:THREE.SmoothShading, wireframe:false});
+	var matBrown = new THREE.MeshPhongMaterial({color:Colors.brown, shading:THREE.SmoothShading, wireframe:false});
+	var matGreen = new THREE.MeshPhongMaterial({color:Colors.green, shading:THREE.FlatShading, wireframe:false});
+
+
 	var geomSandBank = new THREE.SphereBufferGeometry( 150, 10, 10 );
 	var sandBank = new THREE.Mesh( geomSandBank, matYellow );
+	sandBank.position.set(0, -30, 0);
 	sandBank.scale.set(1,0.3,1);
-
+	sandBank.castShadow = false;
+	sandBank.receiveShadow = true;	
 	island.add(sandBank);
+
+	var geomSandBankExtend1 = new THREE.SphereBufferGeometry( 150, 10, 10 );
+	var sandBankExtend1 = new THREE.Mesh( geomSandBankExtend1, matYellow );
+	sandBankExtend1.position.set(30, 0, 40);
+	sandBankExtend1.scale.set(1.3,.9,1);
+	sandBankExtend1.castShadow = false;
+	sandBankExtend1.receiveShadow = true;	
+	sandBank.add(sandBankExtend1);
+
+	var geomBoulderLarge = new THREE.DodecahedronBufferGeometry(20,0);
+	var boulderLarge = new THREE.Mesh( geomBoulderLarge, matGrey );
+	boulderLarge.position.set(-10, 22, 0);
+	boulderLarge.rotation.z = Math.PI/10;
+	boulderLarge.castShadow = true;
+	boulderLarge.receiveShadow = true;	
+	island.add(boulderLarge);
+
+	//Scatter Small boulders
+	for(var i=0; i<15; i++){
+
+		var b = new THREE.Mesh( geomBoulderLarge, matGrey );
+		var min = -50;
+		var max = 80;
+		b.position.z = Math.random() * (max - min) + min;
+		b.position.x = Math.random() * (max - min) + min;
+		b.position.y = 10;
+		b.rotation.y = 0+Math.random()*10;
+		b.rotation.z = 0+Math.random()*10;
+		b.rotation.z = 0+Math.random()*10;
+		var s = .1 + Math.random()*.3;
+		b.scale.set(s,s,s);
+		b.castShadow = true;
+		b.receiveShadow = true;	
+		island.add(b);
+	}
+
+	var palmTree = new THREE.Group();
+	palmTree.position.set(50,16,0);
+
+	var geomPalmTrunkSeg = new THREE.BoxGeometry(8,10,8);
+	geomPalmTrunkSeg.vertices[0].x+=2.5;
+	geomPalmTrunkSeg.vertices[0].z+=2.5;
+	geomPalmTrunkSeg.vertices[1].x+=2.5;
+	geomPalmTrunkSeg.vertices[1].z-=2.5;
+	geomPalmTrunkSeg.vertices[4].x-=2.5;
+	geomPalmTrunkSeg.vertices[4].z-=2.5;
+	geomPalmTrunkSeg.vertices[5].x-=2.5;
+	geomPalmTrunkSeg.vertices[5].z+=2.5;
+	var palmTrunkSeg = new THREE.Mesh(geomPalmTrunkSeg, matBrown);
+	palmTrunkSeg.castShadow = true;
+	palmTrunkSeg.receiveShadow = true;		
+	palmTree.add(palmTrunkSeg);	
+
+	var palmTrunkSeg2 = palmTrunkSeg.clone();
+	palmTrunkSeg2.position.y += 9;
+	palmTrunkSeg2.position.x -= .5;
+	palmTrunkSeg2.rotation.z += 0.2;	
+	//palmTrunkSeg2.rotation.y += 0.2;
+	palmTree.add(palmTrunkSeg2);	
+
+	var palmTrunkSeg3 = palmTrunkSeg2.clone();
+	palmTrunkSeg3.position.y += 9;
+	palmTrunkSeg3.position.x -= 2;
+	palmTrunkSeg3.rotation.y -= 0.2;
+	palmTree.add(palmTrunkSeg3);
+
+	var palmTrunkSeg4 = palmTrunkSeg3.clone();
+	palmTrunkSeg4.position.y += 8.5;
+	palmTrunkSeg4.position.x -= 3;
+	palmTrunkSeg4.rotation.z += 0.2;
+	palmTrunkSeg4.rotation.y += 0.2;
+	palmTree.add(palmTrunkSeg4);
+
+	var palmTrunkSeg5 = palmTrunkSeg4.clone();
+	palmTrunkSeg5.position.y += 8;
+	palmTrunkSeg5.position.x -= 4;
+	//palmTrunkSeg5.rotation.y += 0.2;
+	palmTree.add(palmTrunkSeg5);
+
+	var palmTrunkSeg6 = palmTrunkSeg5.clone();
+	palmTrunkSeg6.position.y += 8;
+	palmTrunkSeg6.position.x -= 4;
+	palmTrunkSeg6.rotation.z += 0.2;
+	palmTree.add(palmTrunkSeg6);
+
+	var palmTrunkSeg7 = palmTrunkSeg6.clone();
+	palmTrunkSeg7.position.y += 7;
+	palmTrunkSeg7.position.x -= 6;
+	palmTrunkSeg7.rotation.z += 0.2;
+	palmTree.add(palmTrunkSeg7);
+
+	var palmTrunkSeg8 = palmTrunkSeg7.clone();
+	palmTrunkSeg8.position.y += 6;
+	palmTrunkSeg8.position.x -= 5.5;
+	palmTrunkSeg8.rotation.z -= 0.2;
+	palmTree.add(palmTrunkSeg8);
+
+	var palmTrunkTop = palmTrunkSeg8.clone();
+	palmTrunkTop.position.y += 10;
+	palmTrunkTop.position.x -= 6;
+	palmTrunkTop.rotation.z -= 0.2;
+	palmTrunkTop.scale.set(1.3,1.6,1.3);
+	palmTree.add(palmTrunkTop);
+
+
+	var palmLeaves = new THREE.Group();
+	palmLeaves.position.set(-34,76,0);
+	palmLeaves.rotation.z = Math.PI/10;
+
+	var geomPalmLeaf = new THREE.BoxGeometry(20,2,60,2,1,4);
+	geomPalmLeaf.vertices[1].y-=1;
+	geomPalmLeaf.vertices[6].y-=1;
+	geomPalmLeaf.vertices[13].y-=1;
+	geomPalmLeaf.vertices[18].y-=1;
+	geomPalmLeaf.vertices[2].y-=3;
+	geomPalmLeaf.vertices[7].y-=3;
+	geomPalmLeaf.vertices[12].y-=3;
+	geomPalmLeaf.vertices[17].y-=3;
+	geomPalmLeaf.vertices[3].y-=10;
+	geomPalmLeaf.vertices[8].y-=10;
+	geomPalmLeaf.vertices[11].y-=10;
+	geomPalmLeaf.vertices[16].y-=10;
+	geomPalmLeaf.vertices[4].y-=20;
+	geomPalmLeaf.vertices[9].y-=20;
+	geomPalmLeaf.vertices[10].y-=20;
+	geomPalmLeaf.vertices[15].y-=20;
+	//Ridge
+	geomPalmLeaf.vertices[20].y-=18;
+	geomPalmLeaf.vertices[21].y-=7;
+	geomPalmLeaf.vertices[22].y-=1;
+	geomPalmLeaf.vertices[26].y-=1;
+	geomPalmLeaf.vertices[27].y-=3;
+	geomPalmLeaf.vertices[28].y-=7;
+	geomPalmLeaf.vertices[29].y-=18;
+	geomPalmLeaf.applyMatrix( new THREE.Matrix4().makeTranslation(0, 0, -30) );
+	var palmLeaf = new THREE.Mesh(geomPalmLeaf, matGreen);
+
+	palmLeaf.castShadow = true;
+	palmLeaf.receiveShadow = true;	
+	palmLeaves.add(palmLeaf);
+
+
+	for(var i=0; i<6; i++){
+
+		var l = new THREE.Mesh( geomPalmLeaf, matGreen );
+		l.rotation.y = i*Math.PI/3;
+		var s = .7 + Math.random()*.95;
+		l.scale.set(1,s,1);
+		l.castShadow = true;
+		l.receiveShadow = true;	
+		palmLeaves.add(l);
+	}
+
+	for(var i=0; i<6; i++){
+
+		var l = new THREE.Mesh( geomPalmLeaf, matGreen );
+		l.rotation.y = i*Math.PI/3 + Math.PI/6;
+		l.position.y = -3;
+		var s = .5 + Math.random()*.8;
+		l.scale.set(.8,s,.7);
+		l.castShadow = true;
+		l.receiveShadow = true;	
+		palmLeaves.add(l);
+	}
+
+	palmTree.add(palmLeaves);	
+
+	island.add(palmTree);
+
+
 	this.mesh.add(island);
 }
 
@@ -783,20 +963,12 @@ function createSea(){
 }
 
 function createLowerSea(){ 
-	lowerSea = new Sea(1.2, 10, 10, .8, 0.5, 0);
+	lowerSea = new Sea(1.2, 10, 10, 1, 0.5, 0);
 	lowerSea.mesh.position.y = -6;
 	lowerSea.mesh.castShadow = false;
 	lowerSea.mesh.receiveShadow = false;
 	scene.add(lowerSea.mesh);
 
-}
-
-function createSeaBottom(){ 
-	seaBottom = new Sea(0, 1, 1, 1, 0, 0);
-	seaBottom.mesh.position.y = -20;
-	seaBottom.mesh.castShadow = false;
-	seaBottom.mesh.receiveShadow = false;
-	scene.add(seaBottom.mesh);
 }
 
 function createIsland(){ 
@@ -808,12 +980,12 @@ function createIsland(){
 
 function createBoat(){ 
 	boat = new Boat();
-	boat.mesh.position.set(0,0,20);
+	boat.mesh.position.set(0,0,10);
 	boat.mesh.scale.set(1,1,1);
 	scene.add(boat.mesh);
 }
 function createBeacon(){ 
-	beacon = new Beacon(Colors.white,Colors.red);
+	beacon = new Beacon(Colors.red,Colors.white);
 	beacon.mesh.position.set(40, 0, -75);
 	scene.add(beacon.mesh);
 }
@@ -829,7 +1001,6 @@ function init() {
 	createLights();
 	createSea();
 	createLowerSea();
-	createSeaBottom();
 	createIsland();
 	createBoat();
 	createBeacon();
