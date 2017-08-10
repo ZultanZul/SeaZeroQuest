@@ -31,7 +31,7 @@ function createScene() {
 
 	var axis = new THREE.AxisHelper(30);
 	axis.position.set(0,5,0);
-	scene.add(axis);
+	//scene.add(axis);
 
 	aspectRatio = WIDTH / HEIGHT;
 	fieldOfView = 60;
@@ -45,7 +45,6 @@ function createScene() {
 		);
 
 	camera.position.set(0,50,100);
-	camera.lookAt(scene.position);
 
 	renderer = new THREE.WebGLRenderer({ 
 		alpha: true, 
@@ -79,7 +78,7 @@ function createLights() {
 
 	shadowLight = new THREE.DirectionalLight(0xbfe0f8, .8);
 
-	shadowLight.position.set(-100,500,-350);
+	shadowLight.position.set(-300,650,350);
 	shadowLight.castShadow = true;
 	shadowLight.shadow.camera.left = -500;
 	shadowLight.shadow.camera.right = 500;
@@ -505,6 +504,13 @@ var Boat = function() {
 	cabinFrontWindow.position.set(0,0,0);
 	cabinFrontWindowFrame.add(cabinFrontWindow);
 
+	var geomCabinShelf = new THREE.BoxGeometry(10,.5,2.5);
+	var cabinShelf = new THREE.Mesh(geomCabinShelf, matBrown);
+	cabinShelf.castShadow = true;
+	cabinShelf.receiveShadow = true;	
+	cabinShelf.position.set(0,-6.25,-.5);
+	cabinFrontWindowFrame.add(cabinShelf);
+
 	//LifeSaver
 	var geomLifeSaver = new THREE.TorusBufferGeometry( 3, 1, 10, 16 );
 	var lifeSaver = new THREE.Mesh(geomLifeSaver, matOrange);
@@ -539,14 +545,18 @@ var Boat = function() {
 	hull.add(cabin);
 
 
+
 	//Engine Block
 	this.engineBlock = new THREE.Group();
-	this.engineBlock.position.set(0,2,27);	
+	this.engineBlock.position.set(0,2,23);
+	var engineBlockOffset = new THREE.Group();
+	engineBlockOffset.applyMatrix( new THREE.Matrix4().makeTranslation(0, 0, 4) );
+
 	var geomEngineMain = new THREE.BoxBufferGeometry(5,8.5,3);
 	var engineMain = new THREE.Mesh(geomEngineMain, matGrey);
 	engineMain.castShadow = true;
 	engineMain.receiveShadow = true;	
-	this.engineBlock.add(engineMain);
+	engineBlockOffset.add(engineMain);
 
 	var geomEngineUpper = new THREE.BoxBufferGeometry(5,3,6);
 	var engineUpper = new THREE.Mesh(geomEngineUpper, matGrey);
@@ -601,12 +611,15 @@ var Boat = function() {
 	propBlade4.rotation.z = -propBlade2.rotation.z
 	propCore.add(propBlade4);
 
-	this.engineBlock.add(this.propellor);
+	engineBlockOffset.add(this.propellor);
+
+	this.engineBlock.add(engineBlockOffset);
+
 	this.group.add(this.engineBlock);
 
 
-
 	this.group.add(hull);
+	this.group.applyMatrix( new THREE.Matrix4().makeTranslation(0, 0, -24) );
 	this.mesh.add(this.group);
 }
 
@@ -703,6 +716,24 @@ var swayBeacon = function (){
 }
 
 
+
+function DesertIsland(){
+	this.mesh = new THREE.Object3D();
+	var island = new THREE.Group();
+
+	island.position.set(0, -30, 0);
+
+	var matYellow = new THREE.MeshPhongMaterial({color:Colors.yellow, shading:THREE.FlatShading, wireframe:false});
+	var geomSandBank = new THREE.SphereBufferGeometry( 150, 10, 10 );
+	var sandBank = new THREE.Mesh( geomSandBank, matYellow );
+	sandBank.scale.set(1,0.3,1);
+
+	island.add(sandBank);
+	this.mesh.add(island);
+}
+
+
+
 function initSkybox(){
 
 	var urls = [
@@ -737,9 +768,12 @@ function initSkybox(){
 
 var lowerSea;
 var sea;
+var seaBottom;
 var boat;
 var beacon;
 var scatteredBeacons;
+var desertIsland;
+
 
 function createSea(){ 
 	sea = new Sea(1.7, 100, 100, 0.8, 0, 0);
@@ -749,16 +783,32 @@ function createSea(){
 }
 
 function createLowerSea(){ 
-	lowerSea = new Sea(1.2, 10, 10, 1, 0.5, 0);
+	lowerSea = new Sea(1.2, 10, 10, .8, 0.5, 0);
 	lowerSea.mesh.position.y = -6;
 	lowerSea.mesh.castShadow = false;
 	lowerSea.mesh.receiveShadow = false;
 	scene.add(lowerSea.mesh);
+
+}
+
+function createSeaBottom(){ 
+	seaBottom = new Sea(0, 1, 1, 1, 0, 0);
+	seaBottom.mesh.position.y = -20;
+	seaBottom.mesh.castShadow = false;
+	seaBottom.mesh.receiveShadow = false;
+	scene.add(seaBottom.mesh);
+}
+
+function createIsland(){ 
+	desertIsland = new DesertIsland();
+	desertIsland.mesh.position.z = -250;
+	desertIsland.mesh.position.x = -80;
+	scene.add(desertIsland.mesh);
 }
 
 function createBoat(){ 
 	boat = new Boat();
-	boat.mesh.position.set(0,0,0);
+	boat.mesh.position.set(0,0,20);
 	boat.mesh.scale.set(1,1,1);
 	scene.add(boat.mesh);
 }
@@ -779,6 +829,8 @@ function init() {
 	createLights();
 	createSea();
 	createLowerSea();
+	createSeaBottom();
+	createIsland();
 	createBoat();
 	createBeacon();
 	scatterBeacons();
@@ -803,47 +855,72 @@ function loop(){
 function update (){
 
 	var delta = clock.getDelta(); // seconds.
-	var moveDistance = 100 * delta; // 100 pixels per second
-	var rotateAngle = Math.PI / 4 * delta;   // pi/2 radians (90 degrees) per second	
+	var rotateAngle = Math.PI / 3.5 * delta;   // pi/2 radians (90 degrees) per second	
 	var propellorAngle = Math.PI * 4 * delta;   // 360 degrees per second
-	var engineAngle = Math.PI  / 5 * delta;
+	var moveDistance = 100 * delta; // 100 pixels per second
 
-	var speed;
-	
-	if ( keyboard.pressed("W") )
+	//Engine Rotation
+	var engineY = boat.engineBlock.rotation.y;
+	var maxEngineY = .8;
+
+	if ( keyboard.pressed("W") ) {
 		boat.mesh.translateZ( -moveDistance );
-	if ( keyboard.pressed("W") )
+
 		boat.propellor.rotateOnAxis( new THREE.Vector3(0,1,0), propellorAngle);
+	}	
 
-	if ( keyboard.pressed("S") )
+	if ( keyboard.pressed("S") ) {
 		boat.mesh.translateZ(  moveDistance );
-	if ( keyboard.pressed("S") )
-		boat.propellor.rotateOnAxis( new THREE.Vector3(0,1,0), -propellorAngle);
 
-	// rotate left/right/up/down
-	var rotation_matrix = new THREE.Matrix4().identity();
-	if ( keyboard.pressed("A") )
-		boat.mesh.rotateOnAxis( new THREE.Vector3(0,1,0), rotateAngle);
-	// if ( keyboard.pressed("A") )
-	// 	boat.engineBlock.rotateOnAxis( new THREE.Vector3(0,1,0), -engineAngle);
+		boat.propellor.rotateOnAxis( new THREE.Vector3(0,1,0), -propellorAngle);		
+	}
 
-	if ( keyboard.pressed("D") )
-		boat.mesh.rotateOnAxis( new THREE.Vector3(0,1,0), -rotateAngle);
-	// if ( keyboard.pressed("D") )
-	// 	boat.engineBlock.rotateOnAxis( new THREE.Vector3(0,1,0), engineAngle);
+	if ( keyboard.pressed("A") ) {
+		setTimeout(function(){
+			boat.mesh.rotateOnAxis( new THREE.Vector3(0,1,0), rotateAngle);
+		}, 100);
+		boat.engineBlock.rotation.y = THREE.Math.clamp(engineY - (delta*2.5), -maxEngineY, maxEngineY);
 
+		if ( ! (keyboard.pressed("W") || keyboard.pressed("S"))) {
+			boat.propellor.rotateOnAxis( new THREE.Vector3(0,1,0), propellorAngle);
+		}
+	}
+
+	if ( keyboard.pressed("D") ){
+		setTimeout(function(){
+			boat.mesh.rotateOnAxis( new THREE.Vector3(0,1,0), -rotateAngle);
+		}, 100);
+
+		boat.engineBlock.rotation.y = THREE.Math.clamp(engineY + (delta*2.5), -maxEngineY, maxEngineY);
+
+		if ( ! (keyboard.pressed("W") || keyboard.pressed("S"))) {
+			boat.propellor.rotateOnAxis( new THREE.Vector3(0,1,0), propellorAngle);
+		}
+	}
+
+	// Steering Decay
+
+	if ( ! ( keyboard.pressed("A") || keyboard.pressed("D") ) && ( keyboard.pressed("W") || keyboard.pressed("S") ) ) {
+
+		if ( engineY > 0 ) {
+			boat.engineBlock.rotation.y = THREE.Math.clamp( engineY - delta * 1.75, 0, maxEngineY );
+		} else {
+			boat.engineBlock.rotation.y = THREE.Math.clamp( engineY + delta * 1.75, - maxEngineY, 0 );
+		}
+	}
 
 	// CHASE CAMERA Controls
 	//---------------------------
 
-	// var relativeCameraOffset = new THREE.Vector3(0,60,150);
+	// var relativeCameraOffset = new THREE.Vector3(0,40,100);
 
 	// var cameraOffset = relativeCameraOffset.applyMatrix4( boat.mesh.matrixWorld );
 
 	// camera.position.x = cameraOffset.x;
 	// camera.position.y = cameraOffset.y;
 	// camera.position.z = cameraOffset.z;
-	// camera.lookAt( boat.mesh.position );
+	// camera.lookAt(boat.mesh.position);
 
 	controls.update();	
 }
+
