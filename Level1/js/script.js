@@ -878,7 +878,7 @@ function DesertIsland(){
 
 	palmLeaf.castShadow = true;
 	palmLeaf.receiveShadow = true;	
-	palmLeaves.add(palmLeaf);
+	//palmLeaves.add(palmLeaf);
 
 
 	for(var i=0; i<6; i++){
