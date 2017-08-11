@@ -40,10 +40,24 @@ function createScene() {
 	nearPlane = 1;
 	farPlane = 10000;
 
+
+	//Build Camera
+
+	camera = new THREE.PerspectiveCamera(
+		fieldOfView,
+		aspectRatio,
+		nearPlane,
+		farPlane
+		);
+
+	camera.position.set(0,30,100);
+
 	renderer = new THREE.WebGLRenderer({ 
 		alpha: true, 
 		antialias: true 
 	});
+
+	controls = new THREE.OrbitControls(camera, renderer.domElement);
 
 	renderer.setSize(WIDTH, HEIGHT);
 	renderer.shadowMap.enabled = true;
@@ -609,19 +623,22 @@ var Boat = function() {
 
 	this.group.add(this.engineBlock);
 
-
 	this.group.add(hull);
-	camera = new THREE.PerspectiveCamera(
-		fieldOfView,
-		aspectRatio,
-		nearPlane,
-		farPlane
-		);
 
-	controls = new THREE.OrbitControls(camera, renderer.domElement);
-	camera.position.set(0,30,100);
+	//Anchor Camera to Boat
 
-	this.group.add(camera);
+	// camera = new THREE.PerspectiveCamera(
+	// 	fieldOfView,
+	// 	aspectRatio,
+	// 	nearPlane,
+	// 	farPlane
+	// 	);
+
+	// controls = new THREE.OrbitControls(camera, renderer.domElement);
+	// camera.position.set(0,30,100);
+
+	// this.group.add(camera);
+
 	this.group.applyMatrix( new THREE.Matrix4().makeTranslation(0, 0, -24) );
 	this.mesh.add(this.group);
 
@@ -968,7 +985,6 @@ function createLowerSea(){
 	lowerSea.mesh.castShadow = false;
 	lowerSea.mesh.receiveShadow = false;
 	scene.add(lowerSea.mesh);
-
 }
 
 function createIsland(){ 
@@ -980,7 +996,7 @@ function createIsland(){
 
 function createBoat(){ 
 	boat = new Boat();
-	boat.mesh.position.set(0,0,10);
+	boat.mesh.position.set(-100,0,10);
 	boat.mesh.scale.set(1,1,1);
 	scene.add(boat.mesh);
 }
@@ -1084,17 +1100,7 @@ function update (){
 		}
 	}
 
-	// CHASE CAMERA Controls
-	//---------------------------
 
-	// var relativeCameraOffset = new THREE.Vector3(0,40,100);
-
-	// var cameraOffset = relativeCameraOffset.applyMatrix4( boat.mesh.matrixWorld );
-
-	// camera.position.x = cameraOffset.x;
-	// camera.position.y = cameraOffset.y;
-	// camera.position.z = cameraOffset.z;
-	// camera.lookAt(boat.mesh.position);
 
 	controls.update();	
 }
