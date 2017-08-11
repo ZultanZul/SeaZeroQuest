@@ -930,6 +930,80 @@ function DesertIsland(){
 }
 
 
+function SeaGull(){
+	this.mesh = new THREE.Object3D();
+	var gull = new THREE.Group();
+	gull.position.set(0, 20, 0);
+
+	var matGrey = new THREE.MeshPhongMaterial({color:Colors.grey, shading:THREE.FlatShading, wireframe:false});
+	var matWhite = new THREE.MeshPhongMaterial({color:Colors.white, shading:THREE.FlatShading, wireframe:false});
+	var matOrange = new THREE.MeshPhongMaterial({color:Colors.orange, shading:THREE.FlatShading, wireframe:false});
+
+	var geomBody = new THREE.BoxGeometry( 4, 4, 18, 2,1,2 );
+	geomBody.vertices[0].y-=1;
+	geomBody.vertices[1].x+=2;
+	geomBody.vertices[2].y-=1;
+	geomBody.vertices[3].y+=1;
+	geomBody.vertices[4].x+=2;
+	geomBody.vertices[5].y+=1;
+	geomBody.vertices[6].y-=1;
+	geomBody.vertices[7].x-=2;
+	geomBody.vertices[8].y-=1;
+	geomBody.vertices[9].y+=1;
+	geomBody.vertices[10].x-=2;
+	geomBody.vertices[11].y+=1;
+	geomBody.vertices[13].y+=1.5;
+	geomBody.vertices[16].y-=1;
+	geomBody.mergeVertices();
+	var body = new THREE.Mesh( geomBody, matWhite );
+	body.castShadow = true;
+	body.receiveShadow = true;	
+	gull.add(body);
+
+	var geomTail = new THREE.BoxGeometry( 4, 2, 6);
+	geomTail.vertices[0].y-=.75;
+	geomTail.vertices[0].x+=1;
+	geomTail.vertices[2].y+=.75;
+	geomTail.vertices[2].x+=1;
+	geomTail.vertices[5].y-=.75;
+	geomTail.vertices[5].x-=1;
+	geomTail.vertices[7].x-=1;
+	geomTail.vertices[7].y+=.75;
+	geomTail.applyMatrix( new THREE.Matrix4().makeTranslation(0, 0, 4) );
+	var tail = new THREE.Mesh( geomTail, matWhite );
+	tail.castShadow = true;
+	//tail.rotation.x = Math.PI/20;
+	tail.receiveShadow = true;	
+	tail.position.set(0,0,8);
+	gull.add(tail);	
+
+	var geomHead = new THREE.BoxGeometry( 3.5, 3.5, 6, 2,1,2 );
+	geomHead.vertices[0].y-=1;
+	geomHead.vertices[1].x+=1;
+	geomHead.vertices[2].y-=1;
+	geomHead.vertices[3].y+=1;
+	geomHead.vertices[4].x+=1;
+	geomHead.vertices[5].y+=1;
+	geomHead.vertices[6].y-=1;
+	geomHead.vertices[7].x-=1;
+	geomHead.vertices[8].y-=1;
+	geomHead.vertices[9].y+=1;
+	geomHead.vertices[10].x-=1;
+	geomHead.vertices[11].y+=1;
+	geomHead.vertices[13].y+=1.5;
+	geomHead.vertices[16].y-=1;
+
+	geomHead.mergeVertices();
+	var head = new THREE.Mesh( geomHead, matWhite );
+	head.castShadow = true;
+	head.receiveShadow = true;	
+	head.position.set(0,0,-11);
+	gull.add(head);	
+
+	this.mesh.add(gull);
+}
+
+
 
 function initSkybox(){
 
@@ -970,6 +1044,7 @@ var boat;
 var beacon;
 var scatteredBeacons;
 var desertIsland;
+var seaGull;
 
 
 function createSea(){ 
@@ -992,6 +1067,11 @@ function createIsland(){
 	desertIsland.mesh.position.z = -250;
 	desertIsland.mesh.position.x = -80;
 	scene.add(desertIsland.mesh);
+}
+
+function createSeaGull(){ 
+	seaGull = new SeaGull();
+	scene.add(seaGull.mesh);
 }
 
 function createBoat(){ 
@@ -1018,6 +1098,7 @@ function init() {
 	createSea();
 	createLowerSea();
 	createIsland();
+	createSeaGull();
 	createBoat();
 	createBeacon();
 	scatterBeacons();
