@@ -959,9 +959,9 @@ function SeaGull(){
 	var gull = new THREE.Group();
 
 
-	var matGrey = new THREE.MeshPhongMaterial({color:Colors.grey, shading:THREE.FlatShading, wireframe:false});
-	var matWhite = new THREE.MeshPhongMaterial({color:Colors.white, shading:THREE.FlatShading, wireframe:false});
-	var matOrange = new THREE.MeshPhongMaterial({color:Colors.orange, shading:THREE.FlatShading, wireframe:false});
+	var matGrey = new THREE.MeshPhongMaterial({color:Colors.grey, shading:THREE.SmoothShading, wireframe:false});
+	var matWhite = new THREE.MeshPhongMaterial({color:Colors.white, shading:THREE.SmoothShading, wireframe:false});
+	var matOrange = new THREE.MeshPhongMaterial({color:Colors.orange, shading:THREE.SmoothShading, wireframe:false});
 
 	var geomBody = new THREE.BoxGeometry( 4, 4, 18, 2,1,2 );
 	geomBody.vertices[0].y-=1;
@@ -1246,6 +1246,7 @@ function createBeacon(){
 	beacon = new Beacon(Colors.red,Colors.white);
 	beacon.mesh.position.set(40, 0, -75);
 	scene.add(beacon.mesh);
+	beaconArray.push(beacon);
 }
 
 function scatterBeacons(){ 
@@ -1281,7 +1282,7 @@ function loop(){
 	sea.moveWaves();
 	lowerSea.moveWaves();
 	boat.swayBoat();
-	beacon.swayBeacon();
+	//beacon.swayBeacon();
 	swayBeacon();
 	seaGull.flapWings();
 
