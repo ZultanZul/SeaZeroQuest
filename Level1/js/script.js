@@ -1030,6 +1030,10 @@ function update (){
 	var propellorAngle = Math.PI * 4 * delta;   // 360 degrees per second
 	var moveDistance = 100 * delta; // 100 pixels per second
 
+
+	//Engine Idle
+	boat.propellor.rotateOnAxis( new THREE.Vector3(0,1,0), propellorAngle/8);
+
 	//Engine Rotation
 	var engineY = boat.engineBlock.rotation.y;
 	var maxEngineY = .8;
