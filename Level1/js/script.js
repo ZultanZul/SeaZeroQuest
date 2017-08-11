@@ -43,21 +43,21 @@ function createScene() {
 
 	//Build Camera
 
-	camera = new THREE.PerspectiveCamera(
-		fieldOfView,
-		aspectRatio,
-		nearPlane,
-		farPlane
-		);
+	// camera = new THREE.PerspectiveCamera(
+	// 	fieldOfView,
+	// 	aspectRatio,
+	// 	nearPlane,
+	// 	farPlane
+	// 	);
 
-	camera.position.set(0,30,100);
+	// camera.position.set(0,30,100);
 
 	renderer = new THREE.WebGLRenderer({ 
 		alpha: true, 
 		antialias: true 
 	});
 
-	controls = new THREE.OrbitControls(camera, renderer.domElement);
+	// controls = new THREE.OrbitControls(camera, renderer.domElement);
 
 	renderer.setSize(WIDTH, HEIGHT);
 	renderer.shadowMap.enabled = true;
@@ -135,6 +135,23 @@ var Sea = function(ampValue, vertX, vertY, waveOpacity,textOffsetX, textOffsetY)
 
 	this.mesh = new THREE.Mesh(geomWaves, matWaves);
 }
+
+var SeaBed= function() {
+	
+	this.mesh = new THREE.Object3D();
+	
+	var geomSeaBed = new THREE.PlaneGeometry( 2000, 2000);
+
+	geomSeaBed.applyMatrix(new THREE.Matrix4().makeRotationX(-Math.PI/2));
+	var matWaves = new THREE.MeshPhongMaterial( {
+		color:0x307ddd,
+		shading:THREE.SmoothShading,
+	});
+	this.mesh = new THREE.Mesh(geomSeaBed, matWaves);
+}
+
+
+
 
 Sea.prototype.moveWaves = function (){
 
@@ -342,6 +359,13 @@ var Boat = function() {
 	rail7.position.set(5.5,7,-17);
 	rail7.rotation.y = Math.PI/3.5;
 	hull.add(rail7);
+
+	var rail8 = rail1.clone();
+	rail8.castShadow = true;
+	rail8.receiveShadow = true;	
+	rail8.position.set(0,7,-24);
+	rail8.rotation.y = Math.PI/4;
+	hull.add(rail8);
 
 
 	//Cabin
@@ -625,19 +649,19 @@ var Boat = function() {
 
 	this.group.add(hull);
 
-	//Anchor Camera to Boat
+	// Anchor Camera to Boat
 
-	// camera = new THREE.PerspectiveCamera(
-	// 	fieldOfView,
-	// 	aspectRatio,
-	// 	nearPlane,
-	// 	farPlane
-	// 	);
+	camera = new THREE.PerspectiveCamera(
+		fieldOfView,
+		aspectRatio,
+		nearPlane,
+		farPlane
+		);
 
-	// controls = new THREE.OrbitControls(camera, renderer.domElement);
-	// camera.position.set(0,30,100);
+	controls = new THREE.OrbitControls(camera, renderer.domElement);
+	camera.position.set(0,30,100);
 
-	// this.group.add(camera);
+	this.group.add(camera);
 
 	this.group.applyMatrix( new THREE.Matrix4().makeTranslation(0, 0, -24) );
 	this.mesh.add(this.group);
@@ -933,7 +957,7 @@ function DesertIsland(){
 function SeaGull(){
 	this.mesh = new THREE.Object3D();
 	var gull = new THREE.Group();
-	gull.position.set(0, 20, 0);
+
 
 	var matGrey = new THREE.MeshPhongMaterial({color:Colors.grey, shading:THREE.FlatShading, wireframe:false});
 	var matWhite = new THREE.MeshPhongMaterial({color:Colors.white, shading:THREE.FlatShading, wireframe:false});
@@ -960,7 +984,7 @@ function SeaGull(){
 	body.receiveShadow = true;	
 	gull.add(body);
 
-	var geomTail = new THREE.BoxGeometry( 4, 2, 6);
+	var geomTail = new THREE.BoxGeometry( 4, 2, 8);
 	geomTail.vertices[0].y-=.75;
 	geomTail.vertices[0].x+=1;
 	geomTail.vertices[2].y+=.75;
@@ -969,40 +993,167 @@ function SeaGull(){
 	geomTail.vertices[5].x-=1;
 	geomTail.vertices[7].x-=1;
 	geomTail.vertices[7].y+=.75;
-	geomTail.applyMatrix( new THREE.Matrix4().makeTranslation(0, 0, 4) );
-	var tail = new THREE.Mesh( geomTail, matWhite );
-	tail.castShadow = true;
+	geomTail.applyMatrix( new THREE.Matrix4().makeTranslation(0, 0, 4.5) );
+	this.tail = new THREE.Mesh( geomTail, matWhite );
+	this.tail.castShadow = true;
 	//tail.rotation.x = Math.PI/20;
-	tail.receiveShadow = true;	
-	tail.position.set(0,0,8);
-	gull.add(tail);	
+	this.tail.receiveShadow = true;	
+	this.tail.position.set(0,0,8);
+	gull.add(this.tail);	
 
 	var geomHead = new THREE.BoxGeometry( 3.5, 3.5, 6, 2,1,2 );
 	geomHead.vertices[0].y-=1;
 	geomHead.vertices[1].x+=1;
-	geomHead.vertices[2].y-=1;
+    geomHead.vertices[2].y-=1;
+    geomHead.vertices[2].z-=1; 
+    geomHead.vertices[2].x-=1; 
 	geomHead.vertices[3].y+=1;
 	geomHead.vertices[4].x+=1;
-	geomHead.vertices[5].y+=1;
-	geomHead.vertices[6].y-=1;
+    geomHead.vertices[5].y+=1;
+    geomHead.vertices[5].z-=1; 
+    geomHead.vertices[5].x-=1; 
+    geomHead.vertices[6].y-=1;
+    geomHead.vertices[6].z-=1; 
+    geomHead.vertices[6].x+=1;   
 	geomHead.vertices[7].x-=1;
 	geomHead.vertices[8].y-=1;
 	geomHead.vertices[9].y+=1;
+	geomHead.vertices[9].z-=1;
+	geomHead.vertices[9].x+=1;
 	geomHead.vertices[10].x-=1;
 	geomHead.vertices[11].y+=1;
-	geomHead.vertices[13].y+=1.5;
+	geomHead.vertices[12].z-=1; 
+    geomHead.vertices[12].y-=1;
+	geomHead.vertices[13].y+=1;
 	geomHead.vertices[16].y-=1;
+    geomHead.vertices[17].y+=1;
+    geomHead.vertices[17].z-=1; 
+  	geomHead.applyMatrix( new THREE.Matrix4().makeTranslation(0, 0, -5) );
+	this.head = new THREE.Mesh( geomHead, matWhite );
+	this.head.rotation.x = -Math.PI/15;
+	this.head.castShadow = true;
+	this.head.receiveShadow = true;	
+	this.head.position.set(0,0.5,-6);
+	gull.add(this.head);	
 
-	geomHead.mergeVertices();
-	var head = new THREE.Mesh( geomHead, matWhite );
-	head.castShadow = true;
-	head.receiveShadow = true;	
-	head.position.set(0,0,-11);
-	gull.add(head);	
+	var geomBeak = new THREE.BoxGeometry(1, 1, 6,);
+	geomBeak.vertices[0].y+=.25;
+	geomBeak.vertices[0].x+=.25;
+	geomBeak.vertices[2].y-=.25;
+	geomBeak.vertices[2].x+=.25;
+	geomBeak.vertices[5].y+=.25;
+	geomBeak.vertices[5].x-=.25;
+	geomBeak.vertices[7].y-=.25;
+	geomBeak.vertices[7].x-=.25;
+	var beak = new THREE.Mesh( geomBeak, matOrange );
+	beak.castShadow = true;
+	beak.receiveShadow = true;	
+	beak.position.set(0,0,-11);
+	this.head.add(beak);	
+
+
+	var geomWingLeftInner = new THREE.BoxGeometry(10, 1, 8);
+	geomWingLeftInner.vertices[0].z+=4;
+	geomWingLeftInner.vertices[0].x+=2;
+	geomWingLeftInner.vertices[5].x+=1.5;
+	geomWingLeftInner.vertices[7].x+=1.5;
+	geomWingLeftInner.vertices[7].y+=.5;
+	geomWingLeftInner.applyMatrix( new THREE.Matrix4().makeTranslation(-8, 0, 0) );
+  	geomWingLeftInner.applyMatrix(new THREE.Matrix4().makeRotationY(-Math.PI/20));
+	this.wingLeftInner = new THREE.Mesh( geomWingLeftInner, matWhite );
+	//this.wingLeftInner.rotation.z = -Math.PI/15;
+	this.wingLeftInner.castShadow = true;
+	this.wingLeftInner.receiveShadow = true;	
+	this.wingLeftInner.position.set(0,0,-2);
+	gull.add(this.wingLeftInner);	
+
+	var geomWingLeftOuter = new THREE.BoxGeometry(16, 1, 8);
+	geomWingLeftOuter.vertices[0].x-=.5;
+	geomWingLeftOuter.vertices[1].x+=.5;
+	geomWingLeftOuter.vertices[2].x-=.5;
+	geomWingLeftOuter.vertices[2].y+=.5;
+	geomWingLeftOuter.vertices[3].x+=.5;
+	geomWingLeftOuter.vertices[4].x+=15;
+	geomWingLeftOuter.vertices[6].x+=5;
+	geomWingLeftOuter.vertices[5].x-=2;
+	geomWingLeftOuter.vertices[5].y-=1;
+	geomWingLeftOuter.vertices[7].x-=2;
+	geomWingLeftOuter.applyMatrix( new THREE.Matrix4().makeTranslation(-8, 0, 0) );
+  	geomWingLeftOuter.applyMatrix(new THREE.Matrix4().makeRotationY(Math.PI/20));
+	this.wingLeftOuter = new THREE.Mesh( geomWingLeftOuter, matWhite );
+	//this.wingLeftOuter.rotation.z = Math.PI/10;
+	this.wingLeftOuter.castShadow = true;
+	this.wingLeftOuter.receiveShadow = true;	
+	this.wingLeftOuter.position.set(-11.8,0,-1.95);
+	this.wingLeftInner.add(this.wingLeftOuter);
+
+
+	var geomWingRightInner = new THREE.BoxGeometry(10, 1, 8);
+	 geomWingRightInner.vertices[5].z+=4;
+	 geomWingRightInner.vertices[7].z+=4;
+	 geomWingRightInner.vertices[7].x-=2;
+	 geomWingRightInner.vertices[7].y+=1;		 
+	 geomWingRightInner.vertices[5].x-=2;
+	 geomWingRightInner.vertices[0].x-=1.5;
+	 geomWingRightInner.vertices[2].x-=1.5;
+	 geomWingRightInner.vertices[2].y+=.5;
+	geomWingRightInner.applyMatrix( new THREE.Matrix4().makeTranslation(8, 0, 0) );
+  	geomWingRightInner.applyMatrix(new THREE.Matrix4().makeRotationY(Math.PI/20));
+
+	this.wingRightInner = new THREE.Mesh( geomWingRightInner, matWhite );
+	//this.wingRightInner.rotation.z = -Math.PI/15;
+	this.wingRightInner.castShadow = true;
+	this.wingRightInner.receiveShadow = true;	
+	this.wingRightInner.position.set(0,0,-2);
+	gull.add(this.wingRightInner);	
+
+
+	var geomWingRightOuter = new THREE.BoxGeometry(16, 1, 8);
+	geomWingRightOuter.vertices[0].x-=.5;
+	geomWingRightOuter.vertices[0].y-=.5;
+	geomWingRightOuter.vertices[1].x+=.5;
+	geomWingRightOuter.vertices[2].x-=.5;
+	geomWingRightOuter.vertices[2].y+=0;
+	geomWingRightOuter.vertices[3].x+=.5;
+	geomWingRightOuter.vertices[4].x+=5;
+	geomWingRightOuter.vertices[6].x+=15;
+	geomWingRightOuter.vertices[5].x-=2;
+	geomWingRightOuter.vertices[5].y-=1;
+	geomWingRightOuter.vertices[7].x-=2;
+	geomWingRightOuter.applyMatrix( new THREE.Matrix4().makeTranslation(-8, 0, 0) );
+ 	geomWingRightOuter.applyMatrix(new THREE.Matrix4().makeRotationY(Math.PI/20));
+  	geomWingRightOuter.applyMatrix(new THREE.Matrix4().makeRotationZ(Math.PI));
+	this.wingRightOuter = new THREE.Mesh( geomWingRightOuter, matWhite );
+	this.wingRightOuter.castShadow = true;
+	this.wingRightOuter.receiveShadow = true;	
+	this.wingRightOuter.position.set(11.8,0,-1.95);
+	this.wingRightInner.add(this.wingRightOuter);
 
 	this.mesh.add(gull);
 }
 
+SeaGull.prototype.flapWings = function (){
+
+	var flapRate = 0.0075;
+
+	// var seconds = clock.getDelta(); // seconds.
+	// var turningCircle = Math.PI / 4 * seconds;
+	// var speed = 50 * seconds;
+
+	//Flap Animation
+	seaGull.wingRightInner.rotation.z = Math.sin(Date.now() * flapRate) * Math.PI * 0.1 ;	
+	seaGull.wingLeftInner.rotation.z = Math.sin(Date.now() * flapRate) * -Math.PI * 0.1 ;	
+	seaGull.wingRightOuter.rotation.z = Math.sin(Date.now() * flapRate) * Math.PI * 0.2 ;	
+	seaGull.wingLeftOuter.rotation.z = Math.sin(Date.now() * flapRate) * -Math.PI * 0.2 ;
+	seaGull.tail.rotation.x = Math.sin(Date.now() * 0.001) * -Math.PI * 0.05 ;
+	seaGull.head.rotation.y = Math.sin(Date.now() * 0.001) * Math.PI * 0.075 ;
+	seaGull.mesh.translateY (Math.sin(Date.now() * flapRate) * -.07)  ;	
+
+	//Circle Movement
+	// seaGull.mesh.translateZ(-speed) ;
+	// seaGull.mesh.rotateOnAxis( new THREE.Vector3(0,1,0), turningCircle);
+
+}
 
 
 function initSkybox(){
@@ -1039,7 +1190,7 @@ function initSkybox(){
 
 var lowerSea;
 var sea;
-var seaBottom;
+var seaBed;
 var boat;
 var beacon;
 var scatteredBeacons;
@@ -1061,22 +1212,33 @@ function createLowerSea(){
 	lowerSea.mesh.receiveShadow = false;
 	scene.add(lowerSea.mesh);
 }
+function createSeaBed(){ 
+	seaBed = new SeaBed();
+	seaBed.mesh.position.y = -7.5;
+	seaBed.mesh.castShadow = false;
+	seaBed.mesh.receiveShadow = false;
+	scene.add(seaBed.mesh);
+}
 
-function createIsland(){ 
+function createIsland(x,y,z){ 
 	desertIsland = new DesertIsland();
-	desertIsland.mesh.position.z = -250;
-	desertIsland.mesh.position.x = -80;
+	desertIsland.mesh.position.z = z;
+	desertIsland.mesh.position.x = x;
+	desertIsland.mesh.rotation.y = y;
 	scene.add(desertIsland.mesh);
 }
 
-function createSeaGull(){ 
+function createSeaGull(x,y,z){ 
 	seaGull = new SeaGull();
+	seaGull.mesh.scale.set(.4,.4,.4);
+	seaGull.mesh.position.set(x, y, z);
 	scene.add(seaGull.mesh);
+
 }
 
 function createBoat(){ 
 	boat = new Boat();
-	boat.mesh.position.set(-100,0,10);
+	boat.mesh.position.set(0,0,10);
 	boat.mesh.scale.set(1,1,1);
 	scene.add(boat.mesh);
 }
@@ -1097,8 +1259,14 @@ function init() {
 	createLights();
 	createSea();
 	createLowerSea();
-	createIsland();
-	createSeaGull();
+	createSeaBed();
+
+	createIsland(-80,0,-250);
+	createIsland(120,2,250);
+	createIsland(-400,-2,250);
+
+	createSeaGull(50, 50, 100);
+
 	createBoat();
 	createBeacon();
 	scatterBeacons();
@@ -1115,6 +1283,7 @@ function loop(){
 	boat.swayBoat();
 	beacon.swayBeacon();
 	swayBeacon();
+	seaGull.flapWings();
 
 	requestAnimationFrame(loop);
 	update();
@@ -1123,11 +1292,21 @@ function loop(){
 function update (){
 
 	var delta = clock.getDelta(); // seconds.
-	var rotateAngle = Math.PI / 3.5 * delta;   // pi/2 radians (90 degrees) per second	
-	var propellorAngle = Math.PI * 4 * delta;   // 360 degrees per second
+
+	//Boat Movement
+	var rotateAngle = Math.PI / 3.5 * delta; 
+	var propellorAngle = Math.PI * 4 * delta;   // degrees per second
 	var moveDistance = 100 * delta; // 100 pixels per second
 
+	//Sea Gull Movement
+	var turningCircle = Math.PI /10 * delta;
+	var speed = 50 * delta;
 
+	seaGull.mesh.translateZ(-speed) ;
+	seaGull.mesh.rotateOnAxis( new THREE.Vector3(0,1,0), turningCircle);
+
+
+	console.log(boat.mesh.position);
 	//Engine Idle
 	boat.propellor.rotateOnAxis( new THREE.Vector3(0,1,0), propellorAngle/8);
 
@@ -1151,7 +1330,12 @@ function update (){
 		setTimeout(function(){
 			boat.mesh.rotateOnAxis( new THREE.Vector3(0,1,0), rotateAngle);
 		}, 100);
-		boat.engineBlock.rotation.y = THREE.Math.clamp(engineY - (delta*2.5), -maxEngineY, maxEngineY);
+
+		if (keyboard.pressed("S")) {
+			boat.engineBlock.rotation.y = THREE.Math.clamp(engineY + (delta*2.5), -maxEngineY, maxEngineY);
+		} else {
+			boat.engineBlock.rotation.y = THREE.Math.clamp(engineY - (delta*2.5), -maxEngineY, maxEngineY);	
+		}
 
 		if ( ! (keyboard.pressed("W") || keyboard.pressed("S"))) {
 			boat.propellor.rotateOnAxis( new THREE.Vector3(0,1,0), propellorAngle);
@@ -1163,7 +1347,12 @@ function update (){
 			boat.mesh.rotateOnAxis( new THREE.Vector3(0,1,0), -rotateAngle);
 		}, 100);
 
-		boat.engineBlock.rotation.y = THREE.Math.clamp(engineY + (delta*2.5), -maxEngineY, maxEngineY);
+		if (keyboard.pressed("S")) {
+			boat.engineBlock.rotation.y = THREE.Math.clamp(engineY - (delta*2.5), -maxEngineY, maxEngineY);
+		} else {
+			boat.engineBlock.rotation.y = THREE.Math.clamp(engineY + (delta*2.5), -maxEngineY, maxEngineY);
+		}
+
 
 		if ( ! (keyboard.pressed("W") || keyboard.pressed("S"))) {
 			boat.propellor.rotateOnAxis( new THREE.Vector3(0,1,0), propellorAngle);

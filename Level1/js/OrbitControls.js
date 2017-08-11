@@ -27,7 +27,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	// How far you can dolly in and out ( PerspectiveCamera only )
 	this.minDistance = 50;
-	this.maxDistance = 400;
+	this.maxDistance = 200;
 
 	// How far you can zoom in and out ( OrthographicCamera only )
 	this.minZoom = 0;
@@ -58,7 +58,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.rotateSpeed = .2;
 
 	// Set to false to disable panning
-	this.enablePan = true;
+	this.enablePan = false;
 	this.keyPanSpeed = 7.0;	// pixels moved per arrow key push
 
 	// Set to true to automatically rotate around the target
@@ -67,7 +67,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.autoRotateSpeed = 2.0; // 30 seconds per round when fps is 60
 
 	// Set to false to disable use of the keys
-	this.enableKeys = true;
+	this.enableKeys = false;
 
 	// The four arrow keys
 	this.keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
