@@ -23,6 +23,11 @@ var scene,
 var keyboard = new THREEx.KeyboardState();
 var clock = new THREE.Clock();
 
+
+
+var isMobile = /iPhone|Android/i.test(navigator.userAgent);
+
+
 function createScene() {
 
 	HEIGHT = window.innerHeight;
@@ -38,7 +43,7 @@ function createScene() {
 	aspectRatio = WIDTH / HEIGHT;
 	fieldOfView = 60;
 	nearPlane = 1;
-	farPlane = 10000;
+	farPlane = 4000;
 
 
 	//Build Camera
@@ -660,7 +665,6 @@ var Boat = function() {
 
 	controls = new THREE.OrbitControls(camera, renderer.domElement);
 	camera.position.set(0,30,100);
-
 	this.group.add(camera);
 
 	this.group.applyMatrix( new THREE.Matrix4().makeTranslation(0, 0, -24) );
@@ -1211,25 +1215,28 @@ function initSkybox(){
 }
 
 
-var lowerSea;
-var sea;
-var seaBed;
-var boat;
-var beacon;
-var scatteredBeacons;
-var desertIsland;
-var seaGull;
+var lowerSea, sea, seaBed, boat, beacon, scatteredBeacons, desertIsland, seaGull;
 
+var seaVertices, seaAmp;
+
+
+if (isMobile){
+	seaVertices = 30;
+	seaAmp = 1.3;
+}else{
+	seaVertices = 100;
+	seaAmp = 1.7;
+}
 
 function createSea(){ 
-	sea = new Sea(1.7, 100, 100, 0.8, 0, 0);
+	sea = new Sea(seaAmp, seaVertices, seaVertices, 0.8, 0, 0);
 	scene.add(sea.mesh);
 	sea.mesh.castShadow = false;
 	sea.mesh.receiveShadow = true;
 }
 
 function createLowerSea(){ 
-	lowerSea = new Sea(1.2, 10, 10, 1, 0.5, 0);
+	lowerSea = new Sea(1.2, seaVertices/10, seaVertices/10, 1, 0.5, 0);
 	lowerSea.mesh.position.y = -6;
 	lowerSea.mesh.castShadow = false;
 	lowerSea.mesh.receiveShadow = false;
@@ -1297,7 +1304,7 @@ function init() {
 	createIsland(-400,-2,300);
 	createIsland(-650,-1.2,-300);
 
-	createSeaGull(200, 65, 40, .4);
+	createSeaGull(200, 65, 100, .4);
 
 	createBoat();
 	createBeacon(-40, 0, 25);
