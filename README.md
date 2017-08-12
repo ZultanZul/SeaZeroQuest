@@ -11,7 +11,7 @@ Elements include:
 - Sea Gull model and animation
 - User Controls with no persistence
 
-### **Controls**
+**Controls** - 
 Mouse/Touch to rotate the camera.
 WASD to move the boat.
 
