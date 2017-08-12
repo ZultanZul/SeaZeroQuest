@@ -11,5 +11,10 @@ Elements include:
 - Sea Gull model and animation
 - User Controls with no persistence
 
+### **Controls**
+Mouse/Touch to rotate the camera.
+WASD to move the boat.
+
+
 ## Level-2 - Optimise all the things
 The next step will be a refactoring of my existing code and funcions to reduce drawCalls. All static geometry will be merged into it's parent mesh.
