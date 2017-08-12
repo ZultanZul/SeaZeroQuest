@@ -17,7 +17,8 @@ Elements include:
 **Controls** - 
 Mouse/Touch to rotate the camera.
 WASD to move the boat.
-Level 1 can be played [here](https://zultanzul.github.io/SeaZeroQuest/Level1)
+
+**Level 1 can be played [here](https://zultanzul.github.io/SeaZeroQuest/Level1)**
 
 
 ## Level-2 - Optimise all the things
