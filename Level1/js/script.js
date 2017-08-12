@@ -538,7 +538,7 @@ var Boat = function() {
 	var cabinShelf = new THREE.Mesh(geomCabinShelf, matBrown);
 	cabinShelf.castShadow = true;
 	cabinShelf.receiveShadow = true;	
-	cabinShelf.position.set(0,-6.25,-.5);
+	cabinShelf.position.set(0,-6.25,-1);
 	cabinFrontWindowFrame.add(cabinShelf);
 
 	//LifeSaver
@@ -728,7 +728,7 @@ Beacon.prototype.swayBeacon = function (){
 }
 
 var beaconArray = [];
-var nBeacons = 15;
+var nBeacons = 5;
 	
 // Randomly Scatter Beacons through the Scene on a 1400x1400 Grid
 
@@ -751,7 +751,7 @@ var ScatterBeacons = function(){
 
 var swayBeacon = function (){
 
-	for (var i = 0; i <nBeacons; i++){
+	for (var i = 0; i <beaconArray.length; i++){
 		var min = 0.005;
 		var max = 0.01;
 		var offset = Math.random() * (max - min) + min;
@@ -954,6 +954,31 @@ function DesertIsland(){
 }
 
 
+var islandArray = [];
+var nIslands = 5;
+	
+// Randomly Scatter Beacons through the Scene on a 1400x1400 Grid
+
+var ScatterIslands = function(){
+
+	this.mesh = new THREE.Object3D();
+
+	for(var i=0; i<nIslands; i++){
+	
+		var island = new DesertIsland();
+		var min = -700;
+		var max = 700;
+		island.mesh.position.z = Math.random() * (max - min) + min;
+		island.mesh.position.x = Math.random() * (max - min) + min;
+		island.mesh.rotation.y = 0+Math.random()*20;
+		islandArray.push(island);
+		this.mesh.add(island.mesh);
+	}
+}
+
+
+
+
 function SeaGull(){
 	this.mesh = new THREE.Object3D();
 	var gull = new THREE.Group();
@@ -1132,27 +1157,25 @@ function SeaGull(){
 	this.mesh.add(gull);
 }
 
-SeaGull.prototype.flapWings = function (){
 
-	var flapRate = 0.0075;
+// var nSeaGulls = 10;
+var seaGullArray = [];
+var seaGullIslandArray = [];
 
-	// var seconds = clock.getDelta(); // seconds.
-	// var turningCircle = Math.PI / 4 * seconds;
-	// var speed = 50 * seconds;
+var flapWings = function (){
 
-	//Flap Animation
-	seaGull.wingRightInner.rotation.z = Math.sin(Date.now() * flapRate) * Math.PI * 0.1 ;	
-	seaGull.wingLeftInner.rotation.z = Math.sin(Date.now() * flapRate) * -Math.PI * 0.1 ;	
-	seaGull.wingRightOuter.rotation.z = Math.sin(Date.now() * flapRate) * Math.PI * 0.2 ;	
-	seaGull.wingLeftOuter.rotation.z = Math.sin(Date.now() * flapRate) * -Math.PI * 0.2 ;
-	seaGull.tail.rotation.x = Math.sin(Date.now() * 0.001) * -Math.PI * 0.05 ;
-	seaGull.head.rotation.y = Math.sin(Date.now() * 0.001) * Math.PI * 0.075 ;
-	seaGull.mesh.translateY (Math.sin(Date.now() * flapRate) * -.07)  ;	
+	for (var i = 0; i <seaGullArray.length; i++){
+		var flapRate = 0.0075;
 
-	//Circle Movement
-	// seaGull.mesh.translateZ(-speed) ;
-	// seaGull.mesh.rotateOnAxis( new THREE.Vector3(0,1,0), turningCircle);
+		seaGullArray[i].wingRightInner.rotation.z = Math.sin(Date.now() * flapRate) * Math.PI * 0.1 ;	
+		seaGullArray[i].wingLeftInner.rotation.z = Math.sin(Date.now() * flapRate) * -Math.PI * 0.1 ;	
+		seaGullArray[i].wingRightOuter.rotation.z = Math.sin(Date.now() * flapRate) * Math.PI * 0.2 ;	
+		seaGullArray[i].wingLeftOuter.rotation.z = Math.sin(Date.now() * flapRate) * -Math.PI * 0.2 ;
+		seaGullArray[i].tail.rotation.x = Math.sin(Date.now() * 0.001) * -Math.PI * 0.05 ;
+		seaGullArray[i].head.rotation.y = Math.sin(Date.now() * 0.001) * Math.PI * 0.075 ;
+		seaGullArray[i].mesh.translateY (Math.sin(Date.now() * flapRate) * -.07)  ;	
 
+    }
 }
 
 
@@ -1222,29 +1245,30 @@ function createSeaBed(){
 
 function createIsland(x,y,z){ 
 	desertIsland = new DesertIsland();
-	desertIsland.mesh.position.z = z;
-	desertIsland.mesh.position.x = x;
-	desertIsland.mesh.rotation.y = y;
+	desertIsland.mesh.position.set(x,y,z);
 	scene.add(desertIsland.mesh);
+	createSeaGull(x-50, 50, z , .3);
+	seaGullIslandArray.push(seaGull);
+	createBeacon(x-150, 0, z+50);
 }
 
-function createSeaGull(x,y,z){ 
+function createSeaGull(x,y,z,s){ 
 	seaGull = new SeaGull();
-	seaGull.mesh.scale.set(.4,.4,.4);
+	seaGull.mesh.scale.set(s,s,s);
 	seaGull.mesh.position.set(x, y, z);
 	scene.add(seaGull.mesh);
-
+	seaGullArray.push(seaGull);
 }
 
 function createBoat(){ 
 	boat = new Boat();
-	boat.mesh.position.set(0,0,10);
+	boat.mesh.position.set(-100,0,100);
 	boat.mesh.scale.set(1,1,1);
 	scene.add(boat.mesh);
 }
-function createBeacon(){ 
+function createBeacon(x,y,z){ 
 	beacon = new Beacon(Colors.red,Colors.white);
-	beacon.mesh.position.set(40, 0, -75);
+	beacon.mesh.position.set(x, y, z);
 	scene.add(beacon.mesh);
 	beaconArray.push(beacon);
 }
@@ -1252,6 +1276,12 @@ function createBeacon(){
 function scatterBeacons(){ 
 	scatteredBeacons = new ScatterBeacons();
 	scene.add(scatteredBeacons.mesh);
+}
+
+
+function scatterIslands(){ 
+	scatterIslands = new ScatterIslands();
+	scene.add(scatterIslands.mesh);
 }
 
 function init() {
@@ -1262,15 +1292,17 @@ function init() {
 	createLowerSea();
 	createSeaBed();
 
-	createIsland(-80,0,-250);
+	createIsland(-80,0,-300);
 	createIsland(120,2,250);
-	createIsland(-400,-2,250);
+	createIsland(-400,-2,300);
+	createIsland(-650,-1.2,-300);
 
-	createSeaGull(50, 50, 100);
+	createSeaGull(200, 65, 40, .4);
 
 	createBoat();
-	createBeacon();
-	scatterBeacons();
+	createBeacon(-40, 0, 25);
+	//scatterIslands();
+	//scatterBeacons();
 	initSkybox();
 	loop();
 }
@@ -1282,9 +1314,9 @@ function loop(){
 	sea.moveWaves();
 	lowerSea.moveWaves();
 	boat.swayBoat();
-	//beacon.swayBeacon();
+
 	swayBeacon();
-	seaGull.flapWings();
+	flapWings();
 
 	requestAnimationFrame(loop);
 	update();
@@ -1299,15 +1331,24 @@ function update (){
 	var propellorAngle = Math.PI * 4 * delta;   // degrees per second
 	var moveDistance = 100 * delta; // 100 pixels per second
 
-	//Sea Gull Movement
-	var turningCircle = Math.PI /10 * delta;
-	var speed = 50 * delta;
+	//Sea Gull Island Movement	
 
-	seaGull.mesh.translateZ(-speed) ;
-	seaGull.mesh.rotateOnAxis( new THREE.Vector3(0,1,0), turningCircle);
+	for (var i = 0; i <seaGullIslandArray.length; i++){
 
+		var turningCircle = -Math.PI /6 * delta;
+		var speed = 40 * delta;
 
-	console.log(boat.mesh.position);
+		seaGullIslandArray[i].mesh.translateZ(-speed) ;
+		seaGullIslandArray[i].mesh.rotateOnAxis( new THREE.Vector3(0,1,0), turningCircle);
+	}
+
+	//Sea Gull Free Movement	
+
+	seaGull.mesh.translateZ(-(speed+.35)) ;
+	seaGull.mesh.rotateOnAxis( new THREE.Vector3(0,1,0), Math.PI /15 * delta);
+
+	//console.log(boat.mesh.position);
+
 	//Engine Idle
 	boat.propellor.rotateOnAxis( new THREE.Vector3(0,1,0), propellorAngle/8);
 
