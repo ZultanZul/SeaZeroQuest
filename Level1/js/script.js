@@ -182,6 +182,7 @@ var Boat = function() {
 	this.group = new THREE.Group();
 
 	var matGrey = new THREE.MeshPhongMaterial({color:Colors.grey, shading:THREE.SmoothShading, wireframe:false});
+	var matDarkGrey = new THREE.MeshPhongMaterial({color:Colors.darkGrey, shading:THREE.FlatShading, wireframe:false});
 	var matWhite = new THREE.MeshPhongMaterial({color:Colors.white, shading:THREE.SmoothShading, wireframe:false});
 	var matRed = new THREE.MeshPhongMaterial({color:Colors.red, shading:THREE.SmoothShading, wireframe:false});
 	var matBrown = new THREE.MeshPhongMaterial({color:Colors.brown, shading:THREE.SmoothShading, wireframe:false});
@@ -300,6 +301,42 @@ var Boat = function() {
 	upperRail.castShadow = true;
 	lowerRail.receiveShadow = true;	
 	hull.add(upperRail);
+
+	var ropeCurve = new THREE.CatmullRomCurve3([
+		new THREE.Vector3(-4.5,0,-.65),
+		new THREE.Vector3(-8,-3,0),
+		new THREE.Vector3(-12.75,0,0.5),
+		new THREE.Vector3(-13,0,0),
+		new THREE.Vector3(-13,-3,-5),	
+		new THREE.Vector3(-13,0,-10),
+		new THREE.Vector3(-13,-3,-15),	
+		new THREE.Vector3(-13,0,-20),	
+		new THREE.Vector3(-13,-3,-25),
+		new THREE.Vector3(-13,0,-30),
+		new THREE.Vector3(-12.5,-3,-35),
+		new THREE.Vector3(-9.75,0,-39),
+		new THREE.Vector3(-6,-3,-44),
+		new THREE.Vector3(-3,0,-48),
+			new THREE.Vector3(0,-2,-51),
+		new THREE.Vector3(3,0,-48),
+		new THREE.Vector3(6,-3,-44),
+		new THREE.Vector3(9.75,0,-39),
+		new THREE.Vector3(12.5,-3,-35),
+		new THREE.Vector3(13,0,-30),
+		new THREE.Vector3(13,-3,-25),
+		new THREE.Vector3(13,0,-20),
+		new THREE.Vector3(13,-3,-15),
+		new THREE.Vector3(13,0,-10),
+		new THREE.Vector3(13,-3,-5),
+		new THREE.Vector3(13,0,0),	
+		new THREE.Vector3(12.75,0,0.5),	
+		new THREE.Vector3(8,-3,0),
+		new THREE.Vector3(4.5,0,-.65)
+		]);
+	var ropeGeom = new THREE.TubeGeometry(ropeCurve, 120, .5, 8, false);
+	var rope = new THREE.Mesh(ropeGeom, matLightBrown);
+	rope.position.set(0,8.5,25);
+	hull.add(rope);
 
 	// Railing
 	var geomRail = new THREE.BoxBufferGeometry(1.5,3,1.5,);
@@ -576,6 +613,37 @@ var Boat = function() {
 	lifeSaverBand3.position.set(0,-5.75,0);
 	lifeSaverBand1.add(lifeSaverBand3);
 	cabin.add(lifeSaver);
+
+
+	var geomChimneyCol = new THREE.CylinderBufferGeometry(0.75,0.75,18,8);
+	var chimneyCol = new THREE.Mesh(geomChimneyCol, matDarkGrey);
+	chimneyCol.castShadow = true;
+	chimneyCol.receiveShadow = true;	
+	chimneyCol.position.set(5,2,5.5);	
+
+	var geomChimneyTop = new THREE.CylinderBufferGeometry(.75,2,2,8);
+	var chimneyColTop = new THREE.Mesh(geomChimneyTop, matDarkGrey);
+	chimneyColTop.castShadow = true;
+	chimneyColTop.receiveShadow = true;
+	chimneyColTop.position.set(2,12,0);
+	chimneyCol.add(chimneyColTop);
+
+	var geomChimneyColAngle = new THREE.CylinderBufferGeometry(0.75,0.75,4,8);
+	var chimneyColAngle = new THREE.Mesh(geomChimneyColAngle, matDarkGrey);
+	chimneyColAngle.castShadow = true;
+	chimneyColAngle.receiveShadow = true;	
+	chimneyColAngle.position.set(1.5,10.5,0);
+	geomChimneyColAngle.applyMatrix(new THREE.Matrix4().makeRotationZ(-Math.PI/4));
+	chimneyCol.add(chimneyColAngle);
+
+
+	var geomChimneyStove = new THREE.CylinderBufferGeometry(2.5,2.5,6,8);
+	var chimneyStove = new THREE.Mesh(geomChimneyStove, matDarkGrey);
+	chimneyStove.castShadow = true;
+	chimneyStove.receiveShadow = true;	
+	chimneyStove.position.set(-1.5,-12,-1);
+	chimneyCol.add(chimneyStove);
+	cabin.add(chimneyCol);
 
 	hull.add(cabin);
 
