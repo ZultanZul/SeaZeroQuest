@@ -308,9 +308,10 @@ var Boat = function() {
 		new THREE.Vector3(-12.75,0,0.5),
 		new THREE.Vector3(-13,0,0),
 		new THREE.Vector3(-13,-3,-5),	
-		new THREE.Vector3(-13,0,-10),
+		new THREE.Vector3(-13,0,-9.5),
+		new THREE.Vector3(-13,0,-10.5),
 		new THREE.Vector3(-13,-3,-15),	
-		new THREE.Vector3(-13,0,-20),	
+		new THREE.Vector3(-13,0,-20),		
 		new THREE.Vector3(-13,-3,-25),
 		new THREE.Vector3(-13,0,-30),
 		new THREE.Vector3(-12.5,-3,-35),
@@ -334,9 +335,37 @@ var Boat = function() {
 		new THREE.Vector3(4.5,0,-.65)
 		]);
 	var ropeGeom = new THREE.TubeGeometry(ropeCurve, 120, .5, 8, false);
-	var rope = new THREE.Mesh(ropeGeom, matLightBrown);
+
+	var textRope = new THREE.TextureLoader().load( "images/rope.jpg" );
+	textRope.wrapS = THREE.RepeatWrapping;
+	textRope.wrapT = THREE.RepeatWrapping;
+	textRope.repeat.set( 50, 1 );
+
+	var matRope = new THREE.MeshStandardMaterial( {
+		transparent: false,
+		map: textRope,
+		roughness: 1,
+	});
+
+	var rope = new THREE.Mesh(ropeGeom, matRope);
 	rope.position.set(0,8.5,25);
 	hull.add(rope);
+
+
+	var geomBoatBoye = new THREE.SphereBufferGeometry(3,8,8);
+	this.boatBoye = new THREE.Mesh(geomBoatBoye, matRed);
+	this.boatBoye.castShadow = true;
+	this.boatBoye.receiveShadow = true;	
+	this.boatBoye.position.set(15,3,0);
+	this.boatBoye.rotation.z = Math.PI/5;
+	hull.add(this.boatBoye);	 
+
+	var geomBoatBoyeTop = new THREE.CylinderBufferGeometry(1,2.5,2,8);
+	var boatBoyeTop = new THREE.Mesh(geomBoatBoyeTop, matWhite);
+	boatBoyeTop.castShadow = true;
+	boatBoyeTop.receiveShadow = true;	
+	boatBoyeTop.position.set(0,2.5,0);
+	this.boatBoye.add(boatBoyeTop);	 
 
 	// Railing
 	var geomRail = new THREE.BoxBufferGeometry(1.5,3,1.5,);
@@ -701,17 +730,17 @@ var Boat = function() {
 	var propBlade2 = propBlade1.clone();
 	propBlade2.position.set(3.5,0,0);
 	propBlade2.rotation.y = Math.PI/2;
-	propBlade2.rotation.z = -propBlade1.rotation.z
+	propBlade2.rotation.z = -propBlade1.rotation.z;
 	propCore.add(propBlade2);
 
 	var propBlade3 = propBlade1.clone();
 	propBlade3.position.set(0,0,3.5);
-	propBlade3.rotation.z = -propBlade1.rotation.z
+	propBlade3.rotation.z = -propBlade1.rotation.z;
 	propCore.add(propBlade3);
 
 	var propBlade4 = propBlade2.clone();
 	propBlade4.position.set(-3.5,0,0);
-	propBlade4.rotation.z = -propBlade2.rotation.z
+	propBlade4.rotation.z = -propBlade2.rotation.z *2;
 	propCore.add(propBlade4);
 
 	engineBlockOffset.add(this.propellor);
@@ -746,7 +775,9 @@ Boat.prototype.swayBoat = function (){
 
 	boat.group.rotation.z = Math.sin(Date.now() * 0.001) * Math.PI * 0.01 ;
 	boat.group.rotation.x = Math.sin(Date.now() * 0.002) * Math.PI * 0.01 ;
-	boat.group.rotation.y = Math.sin(Date.now() * 0.001) * Math.PI * 0.01 ;		
+	boat.group.rotation.y = Math.sin(Date.now() * 0.001) * Math.PI * 0.01 ;	
+
+	//boat.boatBoye.rotation.y = Math.sin(Date.now() * 0.001) * Math.PI * 0.01 ;
 }
 
 
@@ -1403,7 +1434,7 @@ function update (){
 
 	//Boat Movement
 	var rotateAngle = Math.PI / 3.5 * delta; 
-	var propellorAngle = Math.PI * 4 * delta;   // degrees per second
+	var propellorAngle = -Math.PI * 4 * delta;   // degrees per second
 	var moveDistance = 100 * delta; // 100 pixels per second
 
 	//Sea Gull Island Movement	
