@@ -353,19 +353,27 @@ var Boat = function() {
 
 
 	var geomBoatBoye = new THREE.SphereBufferGeometry(3,8,8);
-	this.boatBoye = new THREE.Mesh(geomBoatBoye, matRed);
-	this.boatBoye.castShadow = true;
-	this.boatBoye.receiveShadow = true;	
-	this.boatBoye.position.set(15,3,0);
-	this.boatBoye.rotation.z = Math.PI/5;
-	hull.add(this.boatBoye);	 
+	var boatBoye = new THREE.Mesh(geomBoatBoye, matRed);
+	boatBoye.castShadow = true;
+	boatBoye.receiveShadow = true;	
+	geomBoatBoye.applyMatrix( new THREE.Matrix4().makeTranslation(0, -3, 0) );
+	boatBoye.position.set(13,6,0);
+	boatBoye.rotation.z = Math.PI/6;
+	hull.add(boatBoye);	 
 
 	var geomBoatBoyeTop = new THREE.CylinderBufferGeometry(1,2.5,2,8);
+	geomBoatBoyeTop.applyMatrix( new THREE.Matrix4().makeTranslation(0,-3, 0) );
 	var boatBoyeTop = new THREE.Mesh(geomBoatBoyeTop, matWhite);
 	boatBoyeTop.castShadow = true;
 	boatBoyeTop.receiveShadow = true;	
 	boatBoyeTop.position.set(0,2.5,0);
-	this.boatBoye.add(boatBoyeTop);	 
+	boatBoye.add(boatBoyeTop);	 
+
+	var boatBoye2 = boatBoye.clone();
+	boatBoye2.position.set(-6, 6,-19);
+	boatBoye2.rotation.z = -Math.PI/6;
+	boatBoye2.rotation.y = -Math.PI/6;
+	hull.add(boatBoye2);	 
 
 	// Railing
 	var geomRail = new THREE.BoxBufferGeometry(1.5,3,1.5,);
@@ -776,8 +784,7 @@ Boat.prototype.swayBoat = function (){
 	boat.group.rotation.z = Math.sin(Date.now() * 0.001) * Math.PI * 0.01 ;
 	boat.group.rotation.x = Math.sin(Date.now() * 0.002) * Math.PI * 0.01 ;
 	boat.group.rotation.y = Math.sin(Date.now() * 0.001) * Math.PI * 0.01 ;	
-
-	//boat.boatBoye.rotation.y = Math.sin(Date.now() * 0.001) * Math.PI * 0.01 ;
+	//boat.boatBoye.rotation.z = Math.sin(Date.now() * 0.001) * Math.PI * 0.08;
 }
 
 
