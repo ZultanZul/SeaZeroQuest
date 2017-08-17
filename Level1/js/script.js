@@ -758,7 +758,7 @@ var Boat = function() {
 	bench.castShadow = true;
 	bench.receiveShadow = true;
 	bench.position.set(0,-8,-11.5);
-	cabin.add(bench);
+	//cabin.add(bench);
 
 	var geomBenchTop= new THREE.BoxGeometry(13,1,7,1,1,5);
 	geomBenchTop.vertices[1].y+=1;
