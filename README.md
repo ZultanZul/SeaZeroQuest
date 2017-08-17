@@ -21,5 +21,8 @@ WASD to move the boat.
 **Level 1 can be played [here](https://zultanzul.github.io/SeaZeroQuest/Level1)**
 
 
-## Level-2 - Optimise all the things
-The next step will be a refactoring of my existing code and funcions to reduce drawCalls. All static geometry will be merged into it's parent mesh.
+## [Level-2](https://zultanzul.github.io/SeaZeroQuest/Level2) - Optimise all the things
+The next step is a refactoring of my existing code and functions to reduce drawCalls.
+Currently the water mesh is using 60% of the scenes drawCalls and performance. 
+
+**Level 2 can be played [here](https://zultanzul.github.io/SeaZeroQuest/Level2)**
