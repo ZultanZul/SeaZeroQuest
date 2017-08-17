@@ -92,8 +92,8 @@ function createLights() {
 
 	shadowLight.position.set(-300,650,350);
 	shadowLight.castShadow = true;
-	shadowLight.shadow.camera.left = -500;
-	shadowLight.shadow.camera.right = 500;
+	shadowLight.shadow.camera.left = -700;
+	shadowLight.shadow.camera.right = 700;
 	shadowLight.shadow.camera.top = 500;
 	shadowLight.shadow.camera.bottom = -500;
 	shadowLight.shadow.camera.near = 1;
@@ -320,7 +320,7 @@ var Boat = function() {
 		new THREE.Vector3(-13,0,-30),
 		new THREE.Vector3(-12.5,-3,-35),
 		new THREE.Vector3(-9.75,0,-39),
-		new THREE.Vector3(-6,-3,-44),
+		new THREE.Vector3(-8,-3,-44),
 		new THREE.Vector3(-3,0,-48),
 			new THREE.Vector3(0,-2,-51),
 		new THREE.Vector3(3,0,-48),
@@ -328,7 +328,7 @@ var Boat = function() {
 		new THREE.Vector3(9.75,0,-39),
 		new THREE.Vector3(12.5,-3,-35),
 		new THREE.Vector3(13,0,-30),
-		new THREE.Vector3(13,-3,-25),
+		new THREE.Vector3(14,-3,-25),
 		new THREE.Vector3(13,0,-20),
 		new THREE.Vector3(13,-3,-15),
 		new THREE.Vector3(13,0,-10),
@@ -363,8 +363,8 @@ var Boat = function() {
 	boatBoye.castShadow = true;
 	boatBoye.receiveShadow = true;	
 	geomBoatBoye.applyMatrix( new THREE.Matrix4().makeTranslation(0, -3, 0) );
-	boatBoye.position.set(13,6,0);
-	boatBoye.rotation.z = Math.PI/6;
+	boatBoye.position.set(14,6,0);
+	boatBoye.rotation.z = Math.PI/8;
 	hull.add(boatBoye);	 
 
 	var geomBoatBoyeTop = new THREE.CylinderBufferGeometry(1,2.5,2,8);
@@ -376,7 +376,7 @@ var Boat = function() {
 	boatBoye.add(boatBoyeTop);	 
 
 	var boatBoye2 = boatBoye.clone();
-	boatBoye2.position.set(-6, 6,-19);
+	boatBoye2.position.set(-7.5, 6, -19);
 	boatBoye2.rotation.z = -Math.PI/6;
 	boatBoye2.rotation.y = -Math.PI/6;
 	hull.add(boatBoye2);	 
