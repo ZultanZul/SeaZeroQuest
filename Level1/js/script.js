@@ -12,6 +12,7 @@ var Colors = {
 	blue: 0x307ddd,
 	orange: 0xDB7525,
 	green: 0x28b736,
+	brass: 0xbca345,
 };
 
 window.addEventListener('load', init, false);
@@ -182,7 +183,7 @@ var Boat = function() {
 	this.group = new THREE.Group();
 
 	var matGrey = new THREE.MeshPhongMaterial({color:Colors.grey, shading:THREE.SmoothShading, wireframe:false});
-	var matDarkGrey = new THREE.MeshPhongMaterial({color:Colors.darkGrey, shading:THREE.FlatShading, wireframe:false});
+	var matDarkGrey = new THREE.MeshStandardMaterial({color:Colors.darkGrey,emissive: Colors.darkGrey,emissiveIntensity: 0.25,metalness: .3,roughness: .15,	shading:THREE.FlatShading,	wireframe:false});
 	var matWhite = new THREE.MeshPhongMaterial({color:Colors.white, shading:THREE.SmoothShading, wireframe:false});
 	var matRed = new THREE.MeshPhongMaterial({color:Colors.red, shading:THREE.SmoothShading, wireframe:false});
 	var matBrown = new THREE.MeshPhongMaterial({color:Colors.brown, shading:THREE.SmoothShading, wireframe:false});
@@ -191,6 +192,7 @@ var Boat = function() {
 	var matYellow = new THREE.MeshPhongMaterial({color:Colors.yellow, shading:THREE.SmoothShading, wireframe:false});
 	var matBlueGlass = new THREE.MeshPhongMaterial({color:Colors.blue, shading:THREE.SmoothShading,	transparent: true, opacity: .6, wireframe:false});
 	var matOrange = new THREE.MeshPhongMaterial({color:Colors.orange, shading:THREE.SmoothShading, wireframe:false});
+
 
 
 	var geomHull = new THREE.BoxGeometry(25,5,50,1,1,2);
@@ -302,6 +304,8 @@ var Boat = function() {
 	lowerRail.receiveShadow = true;	
 	hull.add(upperRail);
 
+
+	// Rope railing	
 	var ropeCurve = new THREE.CatmullRomCurve3([
 		new THREE.Vector3(-4.5,0,-.65),
 		new THREE.Vector3(-8,-3,0),
@@ -349,9 +353,11 @@ var Boat = function() {
 
 	var rope = new THREE.Mesh(ropeGeom, matRope);
 	rope.position.set(0,8.5,25);
+	rope.castShadow = true;
+	rope.receiveShadow = true;	
 	hull.add(rope);
 
-
+	// Boyes
 	var geomBoatBoye = new THREE.SphereBufferGeometry(3,8,8);
 	var boatBoye = new THREE.Mesh(geomBoatBoye, matRed);
 	boatBoye.castShadow = true;
@@ -516,7 +522,6 @@ var Boat = function() {
 	cabinSideWallR.position.set(6.5,0,0);
 	cabin.add(cabinSideWallR);
 
-
 		//Cabin SideWindows	
 		var geomCabinSideWindowFrame = new THREE.CylinderGeometry(4,4,1.5,20);
 		var geomCabinSideWindowFrameCut = new THREE.CylinderGeometry(3.5,3.5,1.5,20);
@@ -652,6 +657,7 @@ var Boat = function() {
 	cabin.add(lifeSaver);
 
 
+	//Chimney Stack
 	var geomChimneyCol = new THREE.CylinderBufferGeometry(0.75,0.75,18,8);
 	var chimneyCol = new THREE.Mesh(geomChimneyCol, matDarkGrey);
 	chimneyCol.castShadow = true;
@@ -673,7 +679,6 @@ var Boat = function() {
 	geomChimneyColAngle.applyMatrix(new THREE.Matrix4().makeRotationZ(-Math.PI/4));
 	chimneyCol.add(chimneyColAngle);
 
-
 	var geomChimneyStove = new THREE.CylinderBufferGeometry(2.5,2.5,6,8);
 	var chimneyStove = new THREE.Mesh(geomChimneyStove, matDarkGrey);
 	chimneyStove.castShadow = true;
@@ -682,8 +687,45 @@ var Boat = function() {
 	chimneyCol.add(chimneyStove);
 	cabin.add(chimneyCol);
 
-	hull.add(cabin);
 
+	//AirHorn
+	var matBrass = new THREE.MeshStandardMaterial({
+		color:Colors.brass,
+		emissive: Colors.brass,
+		emissiveIntensity: 0.25,
+		metalness: .3,
+		roughness: .15,
+		shading:THREE.FlatShading,
+		wireframe:false
+	});
+
+	var geomHornLength = new THREE.CylinderBufferGeometry(.5,1,10,8);
+	var hornLength = new THREE.Mesh(geomHornLength, matBrass);
+	hornLength.applyMatrix(new THREE.Matrix4().makeRotationX(Math.PI/1.95));
+	hornLength.castShadow = true;
+	hornLength.receiveShadow = true;
+	hornLength.position.set(-6,1.5,-4);
+	cabinRoof.add(hornLength);
+
+	var geomHornStop= new THREE.BoxBufferGeometry(1.5,1.5,1.5);
+	var hornStop = new THREE.Mesh(geomHornStop, matDarkGrey);
+	hornStop.castShadow = true;
+	hornStop.receiveShadow = true;
+	hornStop.position.set(0,5,0);
+	hornLength.add(hornStop);
+
+
+	var geomHornEnd = new THREE.CylinderGeometry(1,2,2,8);
+	//geomHornEnd.applyMatrix(new THREE.Matrix4().makeRotationX(Math.PI/2));
+	geomHornEnd.vertices[17].y+=1;
+
+	var hornEnd= new THREE.Mesh(geomHornEnd, matBrass);
+	hornEnd.castShadow = true;
+	hornEnd.receiveShadow = true;
+	hornEnd.position.set(0,-6,0);
+	hornLength.add(hornEnd);
+
+	hull.add(cabin);
 
 
 	//Engine Block
@@ -784,7 +826,7 @@ Boat.prototype.swayBoat = function (){
 	boat.group.rotation.z = Math.sin(Date.now() * 0.001) * Math.PI * 0.01 ;
 	boat.group.rotation.x = Math.sin(Date.now() * 0.002) * Math.PI * 0.01 ;
 	boat.group.rotation.y = Math.sin(Date.now() * 0.001) * Math.PI * 0.01 ;	
-	//boat.boatBoye.rotation.z = Math.sin(Date.now() * 0.001) * Math.PI * 0.08;
+	boat.engineBlock.rotation.z = Math.sin(Date.now() * 0.05) * Math.PI * 0.005 ;
 }
 
 
