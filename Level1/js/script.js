@@ -753,14 +753,14 @@ var Boat = function() {
 		shading:THREE.FlatShading,
 	});
 
-	var geomBench= new THREE.BoxGeometry(13,5,5);
+	var geomBench= new THREE.BoxGeometry(13,5,7);
 	var bench = new THREE.Mesh(geomBench, matBench);
 	bench.castShadow = true;
 	bench.receiveShadow = true;
-	bench.position.set(0,-8,-10.5);
+	bench.position.set(0,-8,-11.5);
 	cabin.add(bench);
 
-	var geomBenchTop= new THREE.BoxGeometry(13,1,5,1,1,5);
+	var geomBenchTop= new THREE.BoxGeometry(13,1,7,1,1,5);
 	geomBenchTop.vertices[1].y+=1;
 	geomBenchTop.vertices[2].y+=1.5;
 	geomBenchTop.vertices[3].y+=1.5;
@@ -773,15 +773,16 @@ var Boat = function() {
 	var benchTop = new THREE.Mesh(geomBenchTop, matBench);
 	benchTop.castShadow = true;
 	benchTop.receiveShadow = true;
-	benchTop.position.set(0,3,0);
+	benchTop.rotation.x = Math.PI/90;
+	benchTop.position.set(0,3.1,0);
 	bench.add(benchTop);
 
-	var geomLock= new THREE.BoxGeometry(.75,.75,.25);
+	var geomLock= new THREE.BoxGeometry(1,1,.25);
 	var lock = new THREE.Mesh(geomLock, matBrass);
 	lock.castShadow = true;
 	lock.receiveShadow = true;
-	lock.position.set(0,2,-2.5);
-	bench.add(lock);
+	lock.position.set(0,-.5,-3.5);
+	benchTop.add(lock);
 
 
 	hull.add(cabin);
@@ -1569,6 +1570,10 @@ function update (){
 	//Engine Rotation
 	var engineY = boat.engineBlock.rotation.y;
 	var maxEngineY = .8;
+
+	// if ( ! (keyboard.pressed("W") || keyboard.pressed("S"))) {
+	// boat.engineBlock.rotation.z = Math.sin(Date.now() * 0.05) * Math.PI * 0.005 ;
+	// }
 
 	if ( keyboard.pressed("W") ) {
 		boat.mesh.translateZ( -moveDistance );
