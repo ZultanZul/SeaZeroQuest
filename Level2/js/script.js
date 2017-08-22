@@ -48,6 +48,9 @@ varying vec2 vUv;
 uniform sampler2D uMap;
 uniform float uTime;
 uniform vec3 uColor;
+uniform vec3 fogColor;
+uniform float fogNear;
+uniform float fogFar;
 
 void main() {
 
@@ -64,6 +67,16 @@ void main() {
 
     gl_FragColor = vec4(blue + vec3(tex1.a * 0.4 - tex2.a * 0.02), 1.0);
     gl_FragColor.a = 0.8;
+
+    #ifdef USE_FOG
+          #ifdef USE_LOGDEPTHBUF_EXT
+              float depth = gl_FragDepthEXT / gl_FragCoord.w;
+          #else
+              float depth = gl_FragCoord.z / gl_FragCoord.w;
+          #endif
+          float fogFactor = smoothstep( fogNear, fogFar, depth );
+          gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, fogFactor );
+     #endif
 }
 `;
 
@@ -98,10 +111,24 @@ function createScene() {
 	nearPlane = 1;
 	farPlane = 4000;
 
+
+	//Build Camera
+
+	camera = new THREE.PerspectiveCamera(
+		fieldOfView,
+		aspectRatio,
+		nearPlane,
+		farPlane
+		);
+
+	camera.position.set(0,30,100);
+
 	renderer = new THREE.WebGLRenderer({ 
 		alpha: true, 
 		antialias: true 
 	});
+
+	controls = new THREE.OrbitControls(camera, renderer.domElement);
 
 	renderer.setSize(WIDTH, HEIGHT);
 	renderer.shadowMap.enabled = true;
@@ -153,11 +180,14 @@ var Sea = function() {
         uMap: {type: 't', value: null},
         uTime: {type: 'f', value: 0},
         uColor: {type: 'f', value: new THREE.Color('#307ddd')},
+	   // fogColor:    { type: "c", value: scene.fog.color },
+	   // fogNear:     { type: "f", value: scene.fog.near },
+	   // fogDensity: 1.0,
+	   // fogFar:      { type: "f", value: scene.fog.far },
+       // fog: true
 	    fogColor:    { type: "c", value: scene.fog.color },
 	    fogNear:     { type: "f", value: scene.fog.near },
-	    fogDensity: 1.0,
-	    fogFar:      { type: "f", value: scene.fog.far },
-        fog: true
+	    fogFar:      { type: "f", value: scene.fog.far }
     };
 
 	var shader = new THREE.ShaderMaterial({
@@ -905,95 +935,14 @@ function init() {
 	createScene();
 	createLights();
 	createSea();
-	createBoat();
 	initSkybox();
 	loop();
 }
 
 function loop(e){
-
+	controls.update();	
 	renderer.render(scene, camera);
-	//boat.swayBoat();
 	sea.uniforms.uTime.value = e * 0.001;
 	requestAnimationFrame(loop);
-	update();
+
 }
-
-function update (){
-
-	var delta = clock.getDelta(); // seconds.
-
-	//Boat Movement
-	var rotateAngle = Math.PI / 3.5 * delta; 
-	var propellorAngle = -Math.PI * 4 * delta;   // degrees per second
-	var moveDistance = 100 * delta; // 100 pixels per second
-
-
-	//Engine Idle
-	boat.propellor.rotateOnAxis( new THREE.Vector3(0,1,0), propellorAngle/8);
-
-	//Engine Rotation
-	var engineY = boat.engineBlock.rotation.y;
-	var maxEngineY = .8;
-
-	if ( keyboard.pressed("W") ) {
-		boat.mesh.translateZ( -moveDistance );
-
-		boat.propellor.rotateOnAxis( new THREE.Vector3(0,1,0), propellorAngle);
-	}	
-
-	if ( keyboard.pressed("S") ) {
-		boat.mesh.translateZ(  moveDistance );
-
-		boat.propellor.rotateOnAxis( new THREE.Vector3(0,1,0), -propellorAngle);		
-	}
-
-	if ( keyboard.pressed("A") ) {
-		setTimeout(function(){
-			boat.mesh.rotateOnAxis( new THREE.Vector3(0,1,0), rotateAngle);
-		}, 100);
-
-		if (keyboard.pressed("S")) {
-			boat.engineBlock.rotation.y = THREE.Math.clamp(engineY + (delta*2.5), -maxEngineY, maxEngineY);
-		} else {
-			boat.engineBlock.rotation.y = THREE.Math.clamp(engineY - (delta*2.5), -maxEngineY, maxEngineY);	
-		}
-
-		if ( ! (keyboard.pressed("W") || keyboard.pressed("S"))) {
-			boat.propellor.rotateOnAxis( new THREE.Vector3(0,1,0), propellorAngle);
-		}
-	}
-
-	if ( keyboard.pressed("D") ){
-		setTimeout(function(){
-			boat.mesh.rotateOnAxis( new THREE.Vector3(0,1,0), -rotateAngle);
-		}, 100);
-
-		if (keyboard.pressed("S")) {
-			boat.engineBlock.rotation.y = THREE.Math.clamp(engineY - (delta*2.5), -maxEngineY, maxEngineY);
-		} else {
-			boat.engineBlock.rotation.y = THREE.Math.clamp(engineY + (delta*2.5), -maxEngineY, maxEngineY);
-		}
-
-
-		if ( ! (keyboard.pressed("W") || keyboard.pressed("S"))) {
-			boat.propellor.rotateOnAxis( new THREE.Vector3(0,1,0), propellorAngle);
-		}
-	}
-
-	// Steering Decay
-
-	if ( ! ( keyboard.pressed("A") || keyboard.pressed("D") ) && ( keyboard.pressed("W") || keyboard.pressed("S") ) ) {
-
-		if ( engineY > 0 ) {
-			boat.engineBlock.rotation.y = THREE.Math.clamp( engineY - delta * 1.75, 0, maxEngineY );
-		} else {
-			boat.engineBlock.rotation.y = THREE.Math.clamp( engineY + delta * 1.75, - maxEngineY, 0 );
-		}
-	}
-
-
-
-	controls.update();	
-}
-
