@@ -15,8 +15,8 @@ var Colors = {
 	brass: 0xbca345,
 };
 
-var vertexShader = `
-#define SCALE 30.0
+var verShader = `
+#define SCALE 50.0
 
 varying vec2 vUv;
 
@@ -24,8 +24,8 @@ uniform float uTime;
 
 float calculateSurface(float x, float z) {
     float y = 0.0;
-    y += sin(x * 1.3 / SCALE + uTime * 0.8);
-    y += sin(z * 1.7 / SCALE + uTime * 1.0);
+    y += sin(x * 2.8 / SCALE + uTime * 1.5);
+    y += sin(z * 2.45 / SCALE + uTime * 1.7);
     return y;
 }
 
@@ -37,11 +37,12 @@ void main() {
     pos.y += strength * calculateSurface(pos.x, pos.z);
     pos.y -= strength * calculateSurface(0.0, 0.5);
 
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.1);
+
 }  
 `;
-    
-var fragmentShader = `
+
+var fragShader = `
 varying vec2 vUv;
 
 uniform sampler2D uMap;
@@ -49,19 +50,20 @@ uniform float uTime;
 uniform vec3 uColor;
 
 void main() {
-    vec2 uv = vUv * 30.0 + vec2(uTime * -0.05);
+
+    vec2 uv = vUv * 50.0 + vec2(uTime * -0.05);
 
     uv.y += 0.01 * (sin(uv.x * 3.5 + uTime * 0.35) + sin(uv.x * 4.8 + uTime * 1.05) + sin(uv.x * 7.3 + uTime * 0.45)) / 3.0;
     uv.x += 0.12 * (sin(uv.y * 4.0 + uTime * 0.5) + sin(uv.y * 6.8 + uTime * 0.75) + sin(uv.y * 11.3 + uTime * 0.2)) / 3.0;
     uv.y += 0.12 * (sin(uv.x * 4.2 + uTime * 0.64) + sin(uv.x * 6.3 + uTime * 1.65) + sin(uv.x * 8.2 + uTime * 0.45)) / 3.0;
 
     vec4 tex1 = texture2D(uMap, uv * 1.0);
+    vec4 tex2 = texture2D(uMap, uv * 1.5 + vec2(0.2));
 
     vec3 blue = uColor;
 
-    gl_FragColor = vec4(blue + vec3(tex1.a * 0.65), 1.0);
+    gl_FragColor = vec4(blue + vec3(tex1.a * 0.4 - tex2.a * 0.02), 1.0);
     gl_FragColor.a = 0.8;
-
 }
 `;
 
@@ -158,18 +160,20 @@ var Sea = function() {
         fog: true
     };
 
-   var shader = new THREE.ShaderMaterial({
-        uniforms: this.uniforms,
-        vertexShader: vertexShader,
-        fragmentShader: fragmentShader,
-        side: THREE.DoubleSide,
-        transparent:true
-    });
+	var shader = new THREE.ShaderMaterial({
+
+	    uniforms: this.uniforms,
+	    vertexShader: verShader,
+	    fragmentShader: fragShader,
+	    side: THREE.DoubleSide,
+	    fog: true,
+	    transparent:true,
+	});
 
     var textureLoader = new THREE.TextureLoader();
     textureLoader.load('images/water-shader.png', function (texture) {
         shader.uniforms.uMap.value = texture;
-        texture.wrapS = texture.wrapT = THREE.REPEAT_WRAPPING;
+        texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
     });
 	
 	this.mesh = new THREE.Mesh(geomWaves, shader);
@@ -196,7 +200,7 @@ var Boat = function() {
 
 
 
-	var geomHull = new THREE.BoxGeometry(25,5,50,1,1,2);
+	var geomHull = new THREE.BoxGeometry(25,7,50,1,1,2);
 	//bow vertices
 	geomHull.vertices[2].x-=12.5;
 	geomHull.vertices[5].x-=12.5;
@@ -216,7 +220,7 @@ var Boat = function() {
 	geomHull.vertices[10].z-=10;
 	geomHull.vertices[1].z-=10;
 	geomHull.vertices[7].z-=10;
-
+	geomHull.applyMatrix( new THREE.Matrix4().makeTranslation(0, -1, 0) );
 	var hull = new THREE.Mesh(geomHull, matWhite);
 	hull.position.set(0,0,0);
 	hull.castShadow = true;
@@ -741,61 +745,16 @@ var Boat = function() {
 	hornEnd.position.set(0,-6,0);
 	hornLength.add(hornEnd);
 
-
-	var textBench = new THREE.TextureLoader().load( "images/plank.png" );
-	textBench.wrapS = THREE.RepeatWrapping;
-	textBench.wrapT = THREE.RepeatWrapping;
-	textBench.repeat.set( 5, 5 );
-
-	var matBench = new THREE.MeshStandardMaterial( {
-		transparent: false,
-		map: textBench,
-		roughness: 1,
-		shading:THREE.FlatShading,
-	});
-
-	var geomBench= new THREE.BoxGeometry(13,5,7);
-	var bench = new THREE.Mesh(geomBench, matBench);
-	bench.castShadow = true;
-	bench.receiveShadow = true;
-	bench.position.set(0,-8,-11.5);
-	//cabin.add(bench);
-
-	var geomBenchTop= new THREE.BoxGeometry(13,1,7,1,1,5);
-	geomBenchTop.vertices[1].y+=1;
-	geomBenchTop.vertices[2].y+=1.5;
-	geomBenchTop.vertices[3].y+=1.5;
-	geomBenchTop.vertices[4].y+=1;
-	geomBenchTop.vertices[13].y+=1;
-	geomBenchTop.vertices[14].y+=1.5;
-	geomBenchTop.vertices[15].y+=1.5;
-	geomBenchTop.vertices[16].y+=1;
-
-	var benchTop = new THREE.Mesh(geomBenchTop, matBench);
-	benchTop.castShadow = true;
-	benchTop.receiveShadow = true;
-	benchTop.rotation.x = Math.PI/90;
-	benchTop.position.set(0,3.1,0);
-	bench.add(benchTop);
-
-	var geomLock= new THREE.BoxGeometry(1,1,.25);
-	var lock = new THREE.Mesh(geomLock, matBrass);
-	lock.castShadow = true;
-	lock.receiveShadow = true;
-	lock.position.set(0,-.5,-3.5);
-	benchTop.add(lock);
-
-
 	hull.add(cabin);
 
 
 	//Engine Block
 	this.engineBlock = new THREE.Group();
-	this.engineBlock.position.set(0,2,23);
+	this.engineBlock.position.set(0,1.5,23);
 	var engineBlockOffset = new THREE.Group();
 	engineBlockOffset.applyMatrix( new THREE.Matrix4().makeTranslation(0, 0, 4) );
 
-	var geomEngineMain = new THREE.BoxBufferGeometry(5,8.5,3);
+	var geomEngineMain = new THREE.BoxBufferGeometry(5,14,3);
 	var engineMain = new THREE.Mesh(geomEngineMain, matGrey);
 	engineMain.castShadow = true;
 	engineMain.receiveShadow = true;	
@@ -821,7 +780,7 @@ var Boat = function() {
 	//Propellor
 	this.propellor = new THREE.Group();
 	this.propellor.applyMatrix(new THREE.Matrix4().makeRotationX(-Math.PI/2));
-	this.propellor.position.set(0,-3,2.5);
+	this.propellor.position.set(0,-6,2.5);
 	this.propellor.scale.set(.6,.6,.6);
 
 	var geomPropCore = new THREE.CylinderBufferGeometry( 2, 2, 4, 8, 1);
@@ -925,16 +884,6 @@ function initSkybox(){
 
 var lowerSea, sea, seaBed, boat, beacon, scatteredBeacons, desertIsland, seaGull;
 
-var seaVertices, seaAmp;
-
-
-if (isMobile){
-	seaVertices = 30;
-	seaAmp = 1.3;
-}else{
-	seaVertices = 100;
-	seaAmp = 1.7;
-}
 
 function createSea(){ 
 	sea = new Sea();
@@ -945,7 +894,8 @@ function createSea(){
 
 function createBoat(){ 
 	boat = new Boat();
-	boat.mesh.position.set(-100,0,100);
+	//boat.mesh.position.set(-100,0,100);
+	boat.mesh.position.set(0,.5,0);
 	boat.mesh.scale.set(1,1,1);
 	scene.add(boat.mesh);
 }
@@ -955,9 +905,7 @@ function init() {
 	createScene();
 	createLights();
 	createSea();
-
 	createBoat();
-
 	initSkybox();
 	loop();
 }
@@ -965,8 +913,7 @@ function init() {
 function loop(e){
 
 	renderer.render(scene, camera);
-
-	boat.swayBoat();
+	//boat.swayBoat();
 	sea.uniforms.uTime.value = e * 0.001;
 	requestAnimationFrame(loop);
 	update();
