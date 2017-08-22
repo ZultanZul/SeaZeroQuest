@@ -121,7 +121,7 @@ function createScene() {
 		farPlane
 		);
 
-	camera.position.set(0,30,100);
+	camera.position.set(0,30,150);
 
 	renderer = new THREE.WebGLRenderer({ 
 		alpha: true, 
@@ -180,11 +180,6 @@ var Sea = function() {
         uMap: {type: 't', value: null},
         uTime: {type: 'f', value: 0},
         uColor: {type: 'f', value: new THREE.Color('#307ddd')},
-	   // fogColor:    { type: "c", value: scene.fog.color },
-	   // fogNear:     { type: "f", value: scene.fog.near },
-	   // fogDensity: 1.0,
-	   // fogFar:      { type: "f", value: scene.fog.far },
-       // fog: true
 	    fogColor:    { type: "c", value: scene.fog.color },
 	    fogNear:     { type: "f", value: scene.fog.near },
 	    fogFar:      { type: "f", value: scene.fog.far }
@@ -207,6 +202,17 @@ var Sea = function() {
     });
 	
 	this.mesh = new THREE.Mesh(geomWaves, shader);
+
+	var geomSeaBed = new THREE.PlaneBufferGeometry(2000, 2000, 5, 5);
+	geomSeaBed.applyMatrix(new THREE.Matrix4().makeRotationX(-Math.PI/2));
+	var matWaves = new THREE.MeshPhongMaterial( {
+		color:0x307ddd,
+		shading:THREE.SmoothShading,
+	});
+	var seaBed = new THREE.Mesh(geomSeaBed, matWaves);
+	seaBed.position.set(0,-10,0);
+
+	this.mesh.add(seaBed);
 }
 
 
@@ -869,8 +875,6 @@ var Boat = function() {
 
 }
 
-
-
 Boat.prototype.swayBoat = function (){
 
 	boat.group.rotation.z = Math.sin(Date.now() * 0.001) * Math.PI * 0.01 ;
@@ -878,6 +882,34 @@ Boat.prototype.swayBoat = function (){
 	boat.group.rotation.y = Math.sin(Date.now() * 0.001) * Math.PI * 0.01 ;	
 	boat.engineBlock.rotation.z = Math.sin(Date.now() * 0.05) * Math.PI * 0.005 ;
 }
+
+function DesertIsland(){
+	this.mesh = new THREE.Object3D();
+	var island = new THREE.Group();
+
+	var matYellow = new THREE.MeshPhongMaterial({color:Colors.yellow, shading:THREE.FlatShading, wireframe:false});
+
+	var geomSandBank2 = new THREE.SphereBufferGeometry( 150, 10, 10 );
+	geomSandBank2.applyMatrix( new THREE.Matrix4().makeTranslation(0, 0, 0) );
+	var sandBank2 = new THREE.Mesh(geomSandBank2, matYellow);
+
+	var geomSandBank = new THREE.SphereBufferGeometry( 150, 10, 10 );
+	geomSandBank.applyMatrix( new THREE.Matrix4().makeTranslation(30, 0, 40) );
+	geomSandBank.applyMatrix( new THREE.Matrix4().makeScale(1.3,0.3,1) );
+	sandBank2.updateMatrix();
+	
+	geomSandBank.merge(sandBank2.geometry,sandBank2.matrix);
+
+	var sandBank = new THREE.Mesh( geomSandBank, matYellow );
+	sandBank.position.set(0, -30,0);
+	sandBank.castShadow = false;
+	sandBank.receiveShadow = true;	
+	island.add(sandBank);
+
+
+	this.mesh.add(island);
+}
+
 
 
 function initSkybox(){
@@ -912,7 +944,7 @@ function initSkybox(){
 }
 
 
-var lowerSea, sea, seaBed, boat, beacon, scatteredBeacons, desertIsland, seaGull;
+var sea, boat, desertIsland;
 
 
 function createSea(){ 
@@ -920,6 +952,12 @@ function createSea(){
 	scene.add(sea.mesh);
 	sea.mesh.castShadow = false;
 	sea.mesh.receiveShadow = true;
+}
+
+function createIsland(x,y,z){ 
+	desertIsland = new DesertIsland();
+	desertIsland.mesh.position.set(x,y,z);
+	scene.add(desertIsland.mesh);
 }
 
 function createBoat(){ 
@@ -935,6 +973,8 @@ function init() {
 	createScene();
 	createLights();
 	createSea();
+	// createIsland(-80,0,-300);
+	createIsland(0,0,-100);
 	initSkybox();
 	loop();
 }
