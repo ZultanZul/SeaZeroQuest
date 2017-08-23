@@ -37,5 +37,8 @@ Current: 92 draws, 900 calls
  - Merging Boat Geometry - **reducing 100 drawCalls** - *further opti for calls req.*
  - SeaGulls - Due to the nature of animating all the elements, merging isn't possible. ReUsed geometry and animation for all with offsets for variation. - *further opti for calls req.*
 
+**Controls** - 
+Mouse/Touch to rotate the camera.
+WASD to move the boat.
 
 **Level 2 can be played [here](https://zultanzul.github.io/SeaZeroQuest/Level2)**
