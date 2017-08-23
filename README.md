@@ -24,6 +24,8 @@ WASD to move the boat.
 ## [Level-2](https://zultanzul.github.io/SeaZeroQuest/Level2) - Optimise all the things
 The next step is a refactoring of my existing code and functions to reduce drawCalls.
 
+![Level 2 Screenshot](https://zultanzul.github.io/SeaZeroQuest/resource/screens/level2.png?raw=true "Level 2 Screenshot")
+
 Previous: 450+ draws, 2600 calls
 
 Current: 92 draws, 900 calls
