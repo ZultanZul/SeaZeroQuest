@@ -130,7 +130,8 @@ function createScene() {
 	});
 
 	// controls = new THREE.OrbitControls(camera, renderer.domElement);
-
+	
+	renderer.setPixelRatio( window.devicePixelRatio );
 	renderer.setSize(WIDTH, HEIGHT);
 	renderer.shadowMap.enabled = true;
 	
