@@ -130,11 +130,11 @@ function createScene() {
 	});
 
 	// controls = new THREE.OrbitControls(camera, renderer.domElement);
-	
-	renderer.setPixelRatio( window.devicePixelRatio );
+
+	//renderer.setPixelRatio( window.devicePixelRatio );
 	renderer.setSize(WIDTH, HEIGHT);
-	renderer.shadowMap.enabled = true;
-	
+
+	renderer.shadowMap.enabled = true;	
 	renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 	container = document.getElementById('canvas');
 	container.appendChild(renderer.domElement);
