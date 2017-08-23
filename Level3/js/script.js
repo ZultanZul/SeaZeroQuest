@@ -1467,7 +1467,7 @@ function createIsland(x,y,z){
 	desertIsland = new DesertIsland();
 	desertIsland.mesh.position.set(x,y,z);
 	scene.add(desertIsland.mesh);
-	//createSeaGull(x-50, 50, z , .3);
+	createSeaGull(x-50, 50, z , .3);
 	seaGullIslandArray.push(seaGull);
 	createBeacon(x-150, 0.5, z+50);
 }
@@ -1516,15 +1516,15 @@ function animation (){
 	//////////////////////////
 
 		var gullSpeed = 40 * delta;
+		//Sea Gull Island Movement	
+		for (var i = 0; i <seaGullIslandArray.length; i++){
 
-		// //Sea Gull Island Movement	
-		// for (var i = 0; i <seaGullIslandArray.length; i++){
+			var turningCircle = -Math.PI /6 * delta;
 
-		// 	var turningCircle = -Math.PI /6 * delta;
+			seaGullIslandArray[i].mesh.translateZ(-gullSpeed) ;
+			seaGullIslandArray[i].mesh.rotateOnAxis( new THREE.Vector3(0,1,0), turningCircle);
+		}
 
-		// 	seaGullIslandArray[i].mesh.translateZ(-gullSpeed) ;
-		// 	seaGullIslandArray[i].mesh.rotateOnAxis( new THREE.Vector3(0,1,0), turningCircle);
-		// }
 		//Sea Gull Free Movement	
 		seaGull.mesh.translateZ(-(gullSpeed+.35)) ;
 		seaGull.mesh.rotateOnAxis( new THREE.Vector3(0,1,0), Math.PI /15 * delta);
