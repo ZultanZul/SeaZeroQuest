@@ -888,24 +888,62 @@ function DesertIsland(){
 	var island = new THREE.Group();
 
 	var matYellow = new THREE.MeshPhongMaterial({color:Colors.yellow, shading:THREE.FlatShading, wireframe:false});
+	var matGrey = new THREE.MeshPhongMaterial({color:Colors.darkGrey, shading:THREE.SmoothShading, wireframe:false});
+	var matBrown = new THREE.MeshPhongMaterial({color:Colors.brown, shading:THREE.SmoothShading, wireframe:false});
+	var matGreen = new THREE.MeshPhongMaterial({color:Colors.green, shading:THREE.FlatShading, wireframe:false});
 
-	var geomSandBank2 = new THREE.SphereBufferGeometry( 150, 10, 10 );
-	geomSandBank2.applyMatrix( new THREE.Matrix4().makeTranslation(0, 0, 0) );
-	var sandBank2 = new THREE.Mesh(geomSandBank2, matYellow);
 
 	var geomSandBank = new THREE.SphereBufferGeometry( 150, 10, 10 );
-	geomSandBank.applyMatrix( new THREE.Matrix4().makeTranslation(30, 0, 40) );
-	geomSandBank.applyMatrix( new THREE.Matrix4().makeScale(1.3,0.3,1) );
-	sandBank2.updateMatrix();
-	
-	geomSandBank.merge(sandBank2.geometry,sandBank2.matrix);
-
 	var sandBank = new THREE.Mesh( geomSandBank, matYellow );
-	sandBank.position.set(0, -30,0);
+	sandBank.position.set(0, -30, 0);
+	sandBank.scale.set(1,0.3,1);
 	sandBank.castShadow = false;
 	sandBank.receiveShadow = true;	
 	island.add(sandBank);
 
+	var geomSandBankExtend1 = new THREE.SphereBufferGeometry( 150, 10, 10 );
+	var sandBankExtend1 = new THREE.Mesh( geomSandBankExtend1, matYellow );
+	sandBankExtend1.position.set(30, 0, 40);
+	sandBankExtend1.scale.set(1.3,.9,1);
+	sandBankExtend1.castShadow = false;
+	sandBankExtend1.receiveShadow = true;	
+	sandBank.add(sandBankExtend1);
+	island.add(sandBank);
+
+	var geomBouldersMerged = new THREE.Geometry();
+
+	var geomBoulder = new THREE.DodecahedronGeometry(20,0);
+	var boulderLarge = new THREE.Mesh( geomBoulder, matGrey );
+	boulderLarge.applyMatrix( new THREE.Matrix4().makeTranslation(-10, 22, 0));
+	boulderLarge.applyMatrix(new THREE.Matrix4().makeRotationX(Math.PI/10));
+	boulderLarge.updateMatrix();
+	geomBouldersMerged.merge(boulderLarge.geometry, boulderLarge.matrix);
+
+	//Scatter Small boulders
+	for(var i=0; i<15; i++){
+
+		var b = new THREE.Mesh(geomBoulder, matGrey);
+			var min = -50;
+			var max = 80;
+			b.position.z = Math.random() * (max - min) + min;
+			b.position.x = Math.random() * (max - min) + min;
+			b.position.y = 10;
+			b.rotation.y = 0+Math.random()*10;
+			b.rotation.z = 0+Math.random()*10;
+			b.rotation.z = 0+Math.random()*10;
+			var s = .1 + Math.random()*.3;
+			b.scale.set(s,s,s);
+			b.castShadow = true;
+			b.receiveShadow = true;			
+		b.updateMatrix();
+		geomBouldersMerged.merge(b.geometry, b.matrix);
+	}
+
+	var bouldersMerged = new THREE.Mesh(geomBouldersMerged, matGrey);
+
+	bouldersMerged.castShadow = true;
+	bouldersMerged.receiveShadow = true;
+	island.add(bouldersMerged);
 
 	this.mesh.add(island);
 }
@@ -973,8 +1011,8 @@ function init() {
 	createScene();
 	createLights();
 	createSea();
-	// createIsland(-80,0,-300);
-	createIsland(0,0,-100);
+	createIsland(0,0,-300);
+	//createIsland(0,0,-100);
 	initSkybox();
 	loop();
 }
