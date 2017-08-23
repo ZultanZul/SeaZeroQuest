@@ -1455,7 +1455,7 @@ function createSea(){
 
 function createBoat(){ 
 	boat = new Boat();
-	boat.mesh.position.set(0,.25,100);
+	boat.mesh.position.set(-100,0.25,100);
 	boat.mesh.scale.set(1,1,1);
 	scene.add(boat.mesh);
 }
@@ -1491,8 +1491,11 @@ function init() {
 
 	createSea();
 	createBoat();
-	createIsland(0,0,-300);
-	createBeacon(55, 0.5, 25);
+	createIsland(-80,0,-300);
+	createIsland(120,2,250);
+	createIsland(-400,-2,300);
+	createIsland(-650,-1.2,-300);
+	createBeacon(-40, 0, 25);
 	createSeaGull(200, 65, 100, .4);
 
 	initSkybox();	
