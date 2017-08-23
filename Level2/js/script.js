@@ -115,21 +115,21 @@ function createScene() {
 
 	//Build Camera
 
-	camera = new THREE.PerspectiveCamera(
-		fieldOfView,
-		aspectRatio,
-		nearPlane,
-		farPlane
-		);
+	// camera = new THREE.PerspectiveCamera(
+	// 	fieldOfView,
+	// 	aspectRatio,
+	// 	nearPlane,
+	// 	farPlane
+	// 	);
 
-	camera.position.set(0,30,150);
+	// camera.position.set(0,30,150);
 
 	renderer = new THREE.WebGLRenderer({ 
 		alpha: true, 
 		antialias: true 
 	});
 
-	controls = new THREE.OrbitControls(camera, renderer.domElement);
+	// controls = new THREE.OrbitControls(camera, renderer.domElement);
 
 	renderer.setSize(WIDTH, HEIGHT);
 	renderer.shadowMap.enabled = true;
@@ -714,7 +714,7 @@ var flapWings = function (){
 var Boat = function() {
 	
 	this.mesh = new THREE.Object3D();
-
+	var cameraMesh = new THREE.Group();
 	this.group = new THREE.Group();
 
 	var matGrey = new THREE.MeshPhongMaterial({color:Colors.grey, shading:THREE.SmoothShading, wireframe:false});
@@ -1303,7 +1303,7 @@ var Boat = function() {
 
 	//Engine Block
 	this.engineBlock = new THREE.Group();
-	this.engineBlock.position.set(0,2,23);
+	this.engineBlock.position.set(0,2.5,23);
 	var engineBlockOffset = new THREE.Group();
 	engineBlockOffset.applyMatrix( new THREE.Matrix4().makeTranslation(0, 0, 4) );
 
@@ -1405,21 +1405,26 @@ var Boat = function() {
 	greyGeom.castShadow = true;
 	greyGeom.receiveShadow = true;
 	this.group.add(greyGeom);
+
 	// Anchor Camera to Boat
 
-	// camera = new THREE.PerspectiveCamera(
-	// 	fieldOfView,
-	// 	aspectRatio,
-	// 	nearPlane,
-	// 	farPlane
-	// 	);
+	camera = new THREE.PerspectiveCamera(
+		fieldOfView,
+		aspectRatio,
+		nearPlane,
+		farPlane
+		);
 
-	// controls = new THREE.OrbitControls(camera, renderer.domElement);
-	// camera.position.set(0,30,100);
-	// this.group.add(camera);
+	controls = new THREE.OrbitControls(camera, renderer.domElement);
+	camera.position.set(0,30,100);
 
-	this.group.applyMatrix( new THREE.Matrix4().makeTranslation(0, 0, -24) );
-	this.mesh.add(this.group);
+	cameraMesh.add(camera);
+
+	cameraMesh.applyMatrix( new THREE.Matrix4().makeTranslation(0, 0, -24) );
+
+	cameraMesh.add(this.group);
+
+	this.mesh.add(cameraMesh);
 
 }
 
@@ -1450,7 +1455,7 @@ function createSea(){
 
 function createBoat(){ 
 	boat = new Boat();
-	boat.mesh.position.set(0,.25,25);
+	boat.mesh.position.set(0,.25,100);
 	boat.mesh.scale.set(1,1,1);
 	scene.add(boat.mesh);
 }
