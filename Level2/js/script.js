@@ -1450,7 +1450,7 @@ function createSea(){
 
 function createBoat(){ 
 	boat = new Boat();
-	boat.mesh.position.set(0,.25,50);
+	boat.mesh.position.set(0,.25,25);
 	boat.mesh.scale.set(1,1,1);
 	scene.add(boat.mesh);
 }
@@ -1466,7 +1466,7 @@ function createIsland(x,y,z){
 	desertIsland = new DesertIsland();
 	desertIsland.mesh.position.set(x,y,z);
 	scene.add(desertIsland.mesh);
-	//createSeaGull(x-50, 50, z , .3);
+	createSeaGull(x-50, 50, z , .3);
 	seaGullIslandArray.push(seaGull);
 	createBeacon(x-150, 0.5, z+50);
 }
@@ -1488,7 +1488,7 @@ function init() {
 	createBoat();
 	createIsland(0,0,-300);
 	createBeacon(55, 0.5, 25);
-	//createSeaGull(200, 65, 100, .4);
+	createSeaGull(200, 65, 100, .4);
 
 	initSkybox();	
 	loop();
@@ -1508,22 +1508,22 @@ function loop(e){
 function animation (){
 	var delta = clock.getDelta(); // seconds.
 
-	// //SEAGULL ANIMATIONS
-	// //////////////////////////
+	//SEAGULL ANIMATIONS
+	//////////////////////////
 
-	// 	var gullSpeed = 40 * delta;
-	// 	//Sea Gull Island Movement	
-	// 	for (var i = 0; i <seaGullIslandArray.length; i++){
+		var gullSpeed = 40 * delta;
+		//Sea Gull Island Movement	
+		for (var i = 0; i <seaGullIslandArray.length; i++){
 
-	// 		var turningCircle = -Math.PI /6 * delta;
+			var turningCircle = -Math.PI /6 * delta;
 
-	// 		seaGullIslandArray[i].mesh.translateZ(-gullSpeed) ;
-	// 		seaGullIslandArray[i].mesh.rotateOnAxis( new THREE.Vector3(0,1,0), turningCircle);
-	// 	}
+			seaGullIslandArray[i].mesh.translateZ(-gullSpeed) ;
+			seaGullIslandArray[i].mesh.rotateOnAxis( new THREE.Vector3(0,1,0), turningCircle);
+		}
 
-	// 	//Sea Gull Free Movement	
-	// 	seaGull.mesh.translateZ(-(gullSpeed+.35)) ;
-	// 	seaGull.mesh.rotateOnAxis( new THREE.Vector3(0,1,0), Math.PI /15 * delta);
+		//Sea Gull Free Movement	
+		seaGull.mesh.translateZ(-(gullSpeed+.35)) ;
+		seaGull.mesh.rotateOnAxis( new THREE.Vector3(0,1,0), Math.PI /15 * delta);
 
 
 	//BOAT ANIMATIONS
