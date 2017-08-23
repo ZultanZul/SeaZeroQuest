@@ -741,48 +741,48 @@ var Boat = function() {
 	hornLength.add(hornEnd);
 
 
-	var textBench = new THREE.TextureLoader().load( "images/plank.png" );
-	textBench.wrapS = THREE.RepeatWrapping;
-	textBench.wrapT = THREE.RepeatWrapping;
-	textBench.repeat.set( 5, 5 );
+	// var textBench = new THREE.TextureLoader().load( "images/plank.png" );
+	// textBench.wrapS = THREE.RepeatWrapping;
+	// textBench.wrapT = THREE.RepeatWrapping;
+	// textBench.repeat.set( 5, 5 );
 
-	var matBench = new THREE.MeshStandardMaterial( {
-		transparent: false,
-		map: textBench,
-		roughness: 1,
-		shading:THREE.FlatShading,
-	});
+	// var matBench = new THREE.MeshStandardMaterial( {
+	// 	transparent: false,
+	// 	map: textBench,
+	// 	roughness: 1,
+	// 	shading:THREE.FlatShading,
+	// });
 
-	var geomBench= new THREE.BoxGeometry(13,5,7);
-	var bench = new THREE.Mesh(geomBench, matBench);
-	bench.castShadow = true;
-	bench.receiveShadow = true;
-	bench.position.set(0,-8,-11.5);
-	//cabin.add(bench);
+	// var geomBench= new THREE.BoxGeometry(13,5,7);
+	// var bench = new THREE.Mesh(geomBench, matBench);
+	// bench.castShadow = true;
+	// bench.receiveShadow = true;
+	// bench.position.set(0,-8,-11.5);
+	// /cabin.add(bench);
 
-	var geomBenchTop= new THREE.BoxGeometry(13,1,7,1,1,5);
-	geomBenchTop.vertices[1].y+=1;
-	geomBenchTop.vertices[2].y+=1.5;
-	geomBenchTop.vertices[3].y+=1.5;
-	geomBenchTop.vertices[4].y+=1;
-	geomBenchTop.vertices[13].y+=1;
-	geomBenchTop.vertices[14].y+=1.5;
-	geomBenchTop.vertices[15].y+=1.5;
-	geomBenchTop.vertices[16].y+=1;
+	// var geomBenchTop= new THREE.BoxGeometry(13,1,7,1,1,5);
+	// geomBenchTop.vertices[1].y+=1;
+	// geomBenchTop.vertices[2].y+=1.5;
+	// geomBenchTop.vertices[3].y+=1.5;
+	// geomBenchTop.vertices[4].y+=1;
+	// geomBenchTop.vertices[13].y+=1;
+	// geomBenchTop.vertices[14].y+=1.5;
+	// geomBenchTop.vertices[15].y+=1.5;
+	// geomBenchTop.vertices[16].y+=1;
 
-	var benchTop = new THREE.Mesh(geomBenchTop, matBench);
-	benchTop.castShadow = true;
-	benchTop.receiveShadow = true;
-	benchTop.rotation.x = Math.PI/90;
-	benchTop.position.set(0,3.1,0);
-	bench.add(benchTop);
+	// var benchTop = new THREE.Mesh(geomBenchTop, matBench);
+	// benchTop.castShadow = true;
+	// benchTop.receiveShadow = true;
+	// benchTop.rotation.x = Math.PI/90;
+	// benchTop.position.set(0,3.1,0);
+	// bench.add(benchTop);
 
-	var geomLock= new THREE.BoxGeometry(1,1,.25);
-	var lock = new THREE.Mesh(geomLock, matBrass);
-	lock.castShadow = true;
-	lock.receiveShadow = true;
-	lock.position.set(0,-.5,-3.5);
-	benchTop.add(lock);
+	// var geomLock= new THREE.BoxGeometry(1,1,.25);
+	// var lock = new THREE.Mesh(geomLock, matBrass);
+	// lock.castShadow = true;
+	// lock.receiveShadow = true;
+	// lock.position.set(0,-.5,-3.5);
+	// benchTop.add(lock);
 
 
 	hull.add(cabin);
