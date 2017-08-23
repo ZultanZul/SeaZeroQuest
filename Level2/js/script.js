@@ -210,6 +210,8 @@ var Sea = function() {
 		shading:THREE.SmoothShading,
 	});
 	var seaBed = new THREE.Mesh(geomSeaBed, matWaves);
+	seaBed.castShadow = false;
+	seaBed.receiveShadow = true;
 	seaBed.position.set(0,-10,0);
 
 	this.mesh.add(seaBed);
