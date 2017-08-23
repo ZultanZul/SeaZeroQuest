@@ -32,8 +32,8 @@ Current: 92 draws, 900 calls
  - GLSL WebGL Shader used for water - **reducing 700+ calls**
  - Merging Island Geometry and objects - **reducing 50 drawCalls and 200 calls**
  - Merging Beacon Geometry - **reducing 5 drawCalls and 35 calls**
- - Merging Boat Geometry - **reducing 100 drawCalls** *"further opti for calls req."
- - SeaGulls - Due to the nature of animating all the elements, merging isn't possible. ReUsed geometry and animation for all with offsets for variation. *"further opti for calls req."
+ - Merging Boat Geometry - **reducing 100 drawCalls** - *further opti for calls req.*
+ - SeaGulls - Due to the nature of animating all the elements, merging isn't possible. ReUsed geometry and animation for all with offsets for variation. - *further opti for calls req.*
 
 
 **Level 2 can be played [here](https://zultanzul.github.io/SeaZeroQuest/Level2)**
