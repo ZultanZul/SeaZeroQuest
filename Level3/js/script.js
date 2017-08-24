@@ -48,6 +48,7 @@ varying vec2 vUv;
 uniform sampler2D uMap;
 uniform float uTime;
 uniform vec3 uColor;
+
 uniform vec3 fogColor;
 uniform float fogNear;
 uniform float fogFar;
@@ -199,6 +200,8 @@ var Sea = function() {
     });
 	
 	this.mesh = new THREE.Mesh(geomWaves, shader);
+	this.mesh.castShadow = false;
+	this.mesh.receiveShadow = true;
 
 	var geomSeaBed = new THREE.PlaneBufferGeometry(2000, 2000, 5, 5);
 	geomSeaBed.applyMatrix(new THREE.Matrix4().makeRotationX(-Math.PI/2));
