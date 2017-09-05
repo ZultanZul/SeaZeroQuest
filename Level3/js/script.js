@@ -87,7 +87,7 @@ window.addEventListener('load', init, false);
 
 var scene,
 		camera, fieldOfView, aspectRatio, nearPlane, farPlane, HEIGHT, WIDTH,
-		renderer, container, controls, particleSystem;
+		renderer, container, controls, loaderManager, loaded;
 
 var keyboard = new THREEx.KeyboardState();
 var clock = new THREE.Clock();
@@ -168,6 +168,22 @@ function createLights() {
 	scene.add(shadowLight);
 }
 
+var loaderManager = new THREE.LoadingManager();
+loaderManager.onStart = function ( url, itemsLoaded, itemsTotal ) {
+	console.log( 'Started loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.' );
+};
+loaderManager.onLoad = function ( ) {
+	console.log( 'Loading complete!');
+	finishedLoading();
+};
+loaderManager.onProgress = function ( url, itemsLoaded, itemsTotal ) {
+	console.log( 'Loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.' );
+};
+loaderManager.onError = function ( url ) {
+	console.log( 'There was an error loading ' + url );
+};
+
+
 var Sea = function() {
 	
 	this.mesh = new THREE.Object3D();
@@ -209,7 +225,7 @@ var Sea = function() {
 	    lights: true
 	});
 
-    var textureLoader = new THREE.TextureLoader();
+    var textureLoader = new THREE.TextureLoader(loaderManager);
     textureLoader.load('images/water-shader.png', function (texture) {
         shader.uniforms.uMap.value = texture;
         texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
@@ -244,7 +260,7 @@ function initSkybox(){
 		'images/skybox/sky_pos_z.png'
 	];
 	
-	var reflectionCube = new THREE.CubeTextureLoader().load( urls );
+	var reflectionCube = new THREE.CubeTextureLoader(loaderManager).load( urls );
 	reflectionCube.format = THREE.RGBFormat;
 	
 	var shader = THREE.ShaderLib[ "cube" ];
@@ -425,7 +441,7 @@ var Boat = function() {
 		]);
 	var ropeGeom = new THREE.TubeGeometry(ropeCurve, 120, .5, 8, false);
 
-	var textRope = new THREE.TextureLoader().load( "images/rope.jpg" );
+	var textRope = new THREE.TextureLoader(loaderManager).load( "images/rope.jpg" );
 	textRope.wrapS = THREE.RepeatWrapping;
 	textRope.wrapT = THREE.RepeatWrapping;
 	textRope.repeat.set( 50, 1 );
@@ -1004,6 +1020,11 @@ function createBoat(){
 	boat.mesh.position.set(-100,0.25,100);
 	boat.mesh.scale.set(1,1,1);
 	scene.add(boat.mesh);
+}
+
+function finishedLoading(){
+	loaded = true;
+	document.getElementById('preloader').classList.add('hidden');
 }
 
 function init() {
