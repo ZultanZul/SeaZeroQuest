@@ -18,8 +18,6 @@ var Colors = {
 var verShader = `
 #define SCALE 50.0
 
-#define PHONG
-
 varying vec2 vUv;
 
 uniform float uTime;
@@ -40,6 +38,7 @@ void main() {
     pos.y -= strength * calculateSurface(0.0, 0.5);
 
     gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.1);
+
 }  
 `;
 
@@ -49,7 +48,6 @@ varying vec2 vUv;
 uniform sampler2D uMap;
 uniform float uTime;
 uniform vec3 uColor;
-
 uniform vec3 fogColor;
 uniform float fogNear;
 uniform float fogFar;
@@ -67,7 +65,7 @@ void main() {
 
     vec3 blue = uColor;
 
-    gl_FragColor = vec4(blue + vec3(tex1.a * 0.2 - tex2.a * 0.02), 1.0);
+    gl_FragColor = vec4(blue + vec3(tex1.a * 0.4 - tex2.a * 0.02), 1.0);
     gl_FragColor.a = 0.8;
 
     #ifdef USE_FOG
@@ -87,7 +85,7 @@ window.addEventListener('load', init, false);
 
 var scene,
 		camera, fieldOfView, aspectRatio, nearPlane, farPlane, HEIGHT, WIDTH,
-		renderer, container, controls, loaderManager, loaded;
+		renderer, container, controls,loaderManager,loaded;
 
 var keyboard = new THREEx.KeyboardState();
 var clock = new THREE.Clock();
@@ -103,7 +101,7 @@ function createScene() {
 	WIDTH = window.innerWidth;
 	scene = new THREE.Scene();
 
-	scene.fog = new THREE.Fog (0x064079, 400, 800); 
+	scene.fog = new THREE.Fog (0x4ca7e6, 400, 800); 
 
 	aspectRatio = WIDTH / HEIGHT;
 	fieldOfView = 60;
@@ -149,10 +147,10 @@ function handleWindowResize() {
 var hemisphereLight, shadowLight;
 
 function createLights() {
-	hemisphereLight = new THREE.HemisphereLight(0xaaaaaa,0x000000, .3)
+	hemisphereLight = new THREE.HemisphereLight(0xaaaaaa,0x000000, 1)
 	scene.add(hemisphereLight);  
 
-	shadowLight = new THREE.DirectionalLight(0xbfe0f8, .2);
+	shadowLight = new THREE.DirectionalLight(0xbfe0f8, .8);
 
 	shadowLight.position.set(-300,650,350);
 	shadowLight.castShadow = true;
@@ -167,6 +165,7 @@ function createLights() {
 
 	scene.add(shadowLight);
 }
+
 
 var loaderManager = new THREE.LoadingManager();
 loaderManager.onStart = function ( url, itemsLoaded, itemsTotal ) {
@@ -184,6 +183,7 @@ loaderManager.onError = function ( url ) {
 };
 
 
+
 var Sea = function() {
 	
 	this.mesh = new THREE.Object3D();
@@ -191,28 +191,14 @@ var Sea = function() {
 	var geomWaves = new THREE.PlaneBufferGeometry(2000, 2000, 500, 500);
 	geomWaves.rotateX(-Math.PI / 2);
 
-    this.uniforms = THREE.UniformsUtils.merge( [
-
-    	THREE.UniformsLib[ "lights" ],
-    	THREE.UniformsLib["common"],
-        THREE.UniformsLib["aomap"],
-        THREE.UniformsLib["lightmap"],
-        THREE.UniformsLib["emissivemap"],
-        THREE.UniformsLib["bumpmap"],
-        THREE.UniformsLib["normalmap"],
-        THREE.UniformsLib["displacementmap"],
-        THREE.UniformsLib["gradientmap"],
-        THREE.UniformsLib["fog"],
-    	{
-    		uMap: {type: 't', value: null},
-	        uTime: {type: 'f', value: 0},
-	        uColor: {type: 'f', value: new THREE.Color('#18447c')},
-		    fogColor:    { type: "c", value: scene.fog.color },
-		    fogNear:     { type: "f", value: scene.fog.near },
-		    fogFar:      { type: "f", value: scene.fog.far }
-    	}
-	]);
-
+	this.uniforms = {
+        uMap: {type: 't', value: null},
+        uTime: {type: 'f', value: 0},
+        uColor: {type: 'f', value: new THREE.Color('#307ddd')},
+	    fogColor:    { type: "c", value: scene.fog.color },
+	    fogNear:     { type: "f", value: scene.fog.near },
+	    fogFar:      { type: "f", value: scene.fog.far }
+    };
 
 	var shader = new THREE.ShaderMaterial({
 
@@ -222,7 +208,6 @@ var Sea = function() {
 	    side: THREE.DoubleSide,
 	    fog: true,
 	    transparent:true,
-	    lights: true
 	});
 
     var textureLoader = new THREE.TextureLoader(loaderManager);
@@ -232,13 +217,11 @@ var Sea = function() {
     });
 	
 	this.mesh = new THREE.Mesh(geomWaves, shader);
-	this.mesh.castShadow = false;
-	this.mesh.receiveShadow = true;
 
 	var geomSeaBed = new THREE.PlaneBufferGeometry(2000, 2000, 5, 5);
 	geomSeaBed.applyMatrix(new THREE.Matrix4().makeRotationX(-Math.PI/2));
 	var matWaves = new THREE.MeshPhongMaterial( {
-		color:0x064079,
+		color:0x307ddd,
 		shading:THREE.SmoothShading,
 	});
 	var seaBed = new THREE.Mesh(geomSeaBed, matWaves);
@@ -275,7 +258,6 @@ function initSkybox(){
 		side: THREE.BackSide
 		
 	} ), skyBox = new THREE.Mesh( new THREE.BoxGeometry( 4000, 2000, 4000 ), material );
-	
 	skyBox.position.set(0,0,0);
 	scene.add( skyBox );
 }
@@ -749,7 +731,7 @@ var Boat = function() {
 	this.group = new THREE.Group();
 
 	var matGrey = new THREE.MeshPhongMaterial({color:Colors.grey, shading:THREE.SmoothShading, wireframe:false});
-	var matDarkGrey = new THREE.MeshStandardMaterial({color:Colors.darkGrey,emissive: Colors.darkGrey,emissiveIntensity: 0.25,metalness: .1,roughness: .15,	shading:THREE.FlatShading,	wireframe:false});
+	var matDarkGrey = new THREE.MeshStandardMaterial({color:Colors.darkGrey,emissive: Colors.darkGrey,emissiveIntensity: 0.25,metalness: .3,roughness: .15,	shading:THREE.FlatShading,	wireframe:false});
 	var matWhite = new THREE.MeshPhongMaterial({color:Colors.white, shading:THREE.SmoothShading, wireframe:false});
 	var matRed = new THREE.MeshPhongMaterial({color:Colors.red, shading:THREE.SmoothShading, wireframe:false});
 	var matBrown = new THREE.MeshPhongMaterial({color:Colors.brown, shading:THREE.SmoothShading, wireframe:false});
@@ -1302,7 +1284,7 @@ var Boat = function() {
 		color:Colors.brass,
 		emissive: Colors.brass,
 		emissiveIntensity: 0.25,
-		metalness: .1,
+		metalness: .3,
 		roughness: .15,
 		shading:THREE.FlatShading,
 		wireframe:false
@@ -1491,7 +1473,6 @@ function createBoat(){
 	scene.add(boat.mesh);
 }
 
-<<<<<<< HEAD
 function createBeacon(x,y,z){ 
 	beacon = new Beacon();
 	beacon.mesh.position.set(x, y, z);
@@ -1503,7 +1484,7 @@ function createIsland(x,y,z){
 	desertIsland = new DesertIsland();
 	desertIsland.mesh.position.set(x,y,z);
 	scene.add(desertIsland.mesh);
-	//createSeaGull(x-50, 50, z , .3);
+	createSeaGull(x-50, 50, z , .3);
 	seaGullIslandArray.push(seaGull);
 	createBeacon(x-150, 0.5, z+50);
 }
@@ -1514,18 +1495,16 @@ function createSeaGull(x,y,z,s){
 	seaGull.mesh.position.set(x, y, z);
 	scene.add(seaGull.mesh);
 	seaGullArray.push(seaGull);
-=======
+}
+
 function finishedLoading(){
 	loaded = true;
 	document.getElementById('preloader').classList.add('hidden');
->>>>>>> 665aeccdd540bb333e66129757f12228e6fbbc57
 }
 
 function init() {
-
 	createScene();
 	createLights();
-
 	createSea();
 	createBoat();
 	createIsland(-80,0,-300);
@@ -1534,7 +1513,6 @@ function init() {
 	createIsland(-650,-1.2,-300);
 	createBeacon(-40, 0, 25);
 	createSeaGull(200, 65, 100, .4);
-
 	initSkybox();	
 	loop();
 }
@@ -1558,14 +1536,14 @@ function animation (){
 
 		var gullSpeed = 40 * delta;
 
-		// //Sea Gull Island Movement	
-		// for (var i = 0; i <seaGullIslandArray.length; i++){
+		//Sea Gull Island Movement	
+		for (var i = 0; i <seaGullIslandArray.length; i++){
 
-		// 	var turningCircle = -Math.PI /6 * delta;
+			var turningCircle = -Math.PI /6 * delta;
 
-		// 	seaGullIslandArray[i].mesh.translateZ(-gullSpeed) ;
-		// 	seaGullIslandArray[i].mesh.rotateOnAxis( new THREE.Vector3(0,1,0), turningCircle);
-		// }
+			seaGullIslandArray[i].mesh.translateZ(-gullSpeed) ;
+			seaGullIslandArray[i].mesh.rotateOnAxis( new THREE.Vector3(0,1,0), turningCircle);
+		}
 		//Sea Gull Free Movement	
 		seaGull.mesh.translateZ(-(gullSpeed+.35)) ;
 		seaGull.mesh.rotateOnAxis( new THREE.Vector3(0,1,0), Math.PI /15 * delta);
