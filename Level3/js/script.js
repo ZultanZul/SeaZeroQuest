@@ -83,9 +83,10 @@ void main() {
 
 window.addEventListener('load', init, false);
 
-var scene,
-		camera, fieldOfView, aspectRatio, nearPlane, farPlane, HEIGHT, WIDTH,
-		renderer, container, controls,loaderManager,loaded;
+var scene, camera, fieldOfView, aspectRatio, nearPlane, farPlane, HEIGHT, WIDTH,renderer, container, controls,loaderManager,loaded;
+
+var sphereShape, sphereBody, world, physicsMaterial, walls=[], balls=[], ballMeshes=[], boxes=[], boxMeshes=[];
+
 
 var keyboard = new THREEx.KeyboardState();
 var clock = new THREE.Clock();
@@ -93,6 +94,41 @@ var clock = new THREE.Clock();
 
 
 var isMobile = /iPhone|Android/i.test(navigator.userAgent);
+
+
+function startPhysics(){
+    // Setup our world
+    world = new CANNON.World();
+    world.gravity.set(0,0,-10);
+    world.broadphase = new CANNON.NaiveBroadphase();
+
+
+    // Create a slippery material (friction coefficient = 0.0)
+    physicsMaterial = new CANNON.Material("slipperyMaterial");
+    var physicsContactMaterial = new CANNON.ContactMaterial(
+    	physicsMaterial,
+        physicsMaterial,
+        0.0, // friction coefficient
+        0.3  // restitution
+    );
+
+    // We must add the contact materials to the world
+    world.addContactMaterial(physicsContactMaterial);
+
+    // Create a sphere
+    var mass = 5, radius = 1.3;
+	var sphereShape = new CANNON.Sphere(radius); // Step 1
+	var sphereBody = new CANNON.Body({mass: mass, shape: sphereShape}); // Step 2
+	sphereBody.position.set(0,5,0);
+	sphereBody.linearDamping = 0.9;
+	world.add(sphereBody); // Step 3
+
+    // Create a plane
+    var groundShape = new CANNON.Plane();
+    var groundBody = new CANNON.Body({ mass: 0, shape: groundShape});
+    groundBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2);
+    world.addBody(groundBody);
+}
 
 
 function createScene() {
@@ -108,27 +144,12 @@ function createScene() {
 	nearPlane = 1;
 	farPlane = 4000;
 
-	//Build Camera
-
-	// camera = new THREE.PerspectiveCamera(
-	// 	fieldOfView,
-	// 	aspectRatio,
-	// 	nearPlane,
-	// 	farPlane
-	// 	);
-
-	// camera.position.set(0,30,150);
-
 	renderer = new THREE.WebGLRenderer({ 
 		alpha: true, 
 		antialias: true 
 	});
 
-	// controls = new THREE.OrbitControls(camera, renderer.domElement);
-
-	//renderer.setPixelRatio( window.devicePixelRatio );
 	renderer.setSize(WIDTH, HEIGHT);
-
 	renderer.shadowMap.enabled = true;	
 	renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 	container = document.getElementById('canvas');
@@ -1503,6 +1524,7 @@ function finishedLoading(){
 }
 
 function init() {
+	startPhysics();
 	createScene();
 	createLights();
 	createSea();
@@ -1514,8 +1536,9 @@ function init() {
 	createBeacon(-40, 0, 25);
 	createSeaGull(200, 65, 100, .4);
 	initSkybox();	
-	loop();
+	loop();	
 }
+
 
 function loop(e){
 	sea.uniforms.uTime.value = e * 0.001;
