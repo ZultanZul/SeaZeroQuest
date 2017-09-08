@@ -42,3 +42,15 @@ Mouse/Touch to rotate the camera.
 WASD to move the boat.
 
 **Level 2 can be played [here](https://zultanzul.github.io/SeaZeroQuest/Level2)**
+
+
+## [Level-3](https://zultanzul.github.io/SeaZeroQuest/Level3) - Physics with Cannon.js
+To add collision detection and make the controls feel better, I decided to add a physics engine to the scene.
+
+Cannon.js is a physics engine written in and for Javascript and runs well with Three.js. It requires running a seperate physics "world" along side the three.js world.
+
+**Controls** - 
+Mouse/Touch to rotate the camera.
+WASD to move the boat.
+
+**Level 3 can be played [here](https://zultanzul.github.io/SeaZeroQuest/Level3)**
